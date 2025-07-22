@@ -9,5 +9,5 @@ export interface Badge {
   description: string;
   txHash: string;
   date: string;
-  icon: string;
+  icon: string; // Can be a lucide-react icon name OR a base64 data URI for generated images
 }

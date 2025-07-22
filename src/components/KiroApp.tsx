@@ -22,19 +22,40 @@ interface KiroAppProps {
   user: User;
 }
 
-const initialCode = `def calculate_sum(numbers):
-  # This function has a bug!
-  total = 0
-  for num in numbers:
-    tota = total + num # Typo here: 'tota' should be 'total'
-  return total
+const initialCode = `function promisify(fn) {
+  return function(...args) {
+    return new Promise((resolve, reject) => {
+      fn(...args, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      });
+    });
+  };
+}
 
-print(calculate_sum([1, 2, 3, 4, 5]))
+// Example usage:
+function callbackStyleFunction(value, callback) {
+  setTimeout(() => {
+    if (value > 0) {
+      callback(null, 'Success');
+    } else {
+      callback('Error: Value must be positive');
+    }
+  }, 1000);
+}
+
+const promisedFunction = promisify(callbackStyleFunction);
+
+promisedFunction(1)
+  .then(console.log)
+  .catch(console.error);
 `;
 
 const initialMessages: ChatMessage[] = [
-  { role: 'assistant', content: "Hello! I'm Kiro, your AI code mentor. The editor has some sample Python code with a bug." },
-  { role: 'assistant', content: 'You can ask for feedback, or ask me any questions about your code.' }
+  { role: 'assistant', content: "Hello! I'm Kiro, your AI code mentor. The editor has some sample code demonstrating JavaScript Promises." },
+  { role: 'assistant', content: 'You can ask for feedback, or award an AI-powered skill badge based on the code.' }
 ];
 
 export default function KiroApp({ user }: KiroAppProps) {
@@ -74,19 +95,19 @@ export default function KiroApp({ user }: KiroAppProps) {
     setIsLoading(prev => ({ ...prev, chat: false }));
   };
 
-  const handleMintBadge = async () => {
+  const handleAwardBadge = async () => {
     setIsLoading(prev => ({ ...prev, badges: true }));
     const result = await awardSkillBadgeAction(user.uid, codeContent);
     if (result.success && result.badge) {
       setUserBadges(prev => [...prev, result.badge!]);
       toast({
-        title: 'Badge Minted!',
-        description: `Your "${result.badge.name}" badge has been awarded.`,
+        title: 'Badge Awarded!',
+        description: `Your "${result.badge.name}" badge has been minted.`,
       });
     } else {
       toast({
         variant: 'destructive',
-        title: 'Minting Failed',
+        title: 'Awarding Failed',
         description: result.error || 'An unexpected error occurred.',
       });
     }
@@ -127,7 +148,7 @@ export default function KiroApp({ user }: KiroAppProps) {
           <div className="lg:col-span-12 xl:col-span-3">
              <BadgesDisplay
               badges={userBadges}
-              onMintBadge={handleMintBadge}
+              onAwardBadge={handleAwardBadge}
               isLoading={isLoading.badges}
             />
           </div>

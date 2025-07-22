@@ -3,6 +3,7 @@
 import { getCodeFeedback as getCodeFeedbackFlow } from '@/ai/flows/get-code-feedback';
 import { sendChatMessage as sendChatMessageFlow } from '@/ai/flows/send-chat-message';
 import { awardSkillBadge as awardSkillBadgeFlow } from '@/ai/flows/award-skill-badge';
+import { generateBadgeIcon as generateBadgeIconFlow } from '@/ai/flows/generate-badge-icon';
 import { adminDb } from '@/lib/firebase/admin';
 import type { Badge } from '@/types';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -43,7 +44,6 @@ export async function getUserBadges(userId: string): Promise<Badge[]> {
   }
 }
 
-// This function is now more generic and can be reused.
 export async function mintSkillBadgeAction(userId: string, badgeDetails: Omit<Badge, 'id' | 'txHash' | 'date'>): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
   if (!userId) {
     return { success: false, error: 'User not authenticated.' };
@@ -86,13 +86,17 @@ export async function awardSkillBadgeAction(userId: string, code: string): Promi
     try {
         // 1. Get badge details from AI
         const aiResult = await awardSkillBadgeFlow({ code });
-        const { badgeName, badgeDescription, badgeIcon } = aiResult;
+        const { badgeName, badgeDescription } = aiResult;
         
-        // 2. Mint the badge with the dynamic details
+        // 2. Generate badge icon from AI
+        const iconResult = await generateBadgeIconFlow({ badgeName });
+        const { iconDataUri } = iconResult;
+
+        // 3. Mint the badge with the dynamic details
         const mintResult = await mintSkillBadgeAction(userId, {
             name: badgeName,
             description: badgeDescription,
-            icon: badgeIcon,
+            icon: iconDataUri, // Use the generated image data URI
         });
 
         return mintResult;
