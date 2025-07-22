@@ -10,7 +10,7 @@ import {
   getCodeFeedbackAction,
   sendChatMessageAction,
   getUserBadges,
-  mintSkillBadgeAction,
+  awardSkillBadgeAction,
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -76,7 +76,7 @@ export default function KiroApp({ user }: KiroAppProps) {
 
   const handleMintBadge = async () => {
     setIsLoading(prev => ({ ...prev, badges: true }));
-    const result = await mintSkillBadgeAction(user.uid);
+    const result = await awardSkillBadgeAction(user.uid, codeContent);
     if (result.success && result.badge) {
       setUserBadges(prev => [...prev, result.badge!]);
       toast({

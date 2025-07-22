@@ -4,7 +4,7 @@ import type { Badge } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Award, Code, Loader2 } from "lucide-react";
+import { Award, Code, Loader2, Repeat, ShieldCheck, GitMerge } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 interface BadgesDisplayProps {
@@ -16,6 +16,9 @@ interface BadgesDisplayProps {
 const iconMap: { [key: string]: React.ElementType } = {
   Award,
   Code,
+  Repeat,
+  ShieldCheck,
+  GitMerge,
   default: Award,
 };
 
@@ -70,7 +73,7 @@ export default function BadgesDisplay({ badges, onMintBadge, isLoading }: Badges
       <CardFooter>
          <Button onClick={onMintBadge} disabled={isLoading} className="w-full">
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Mint New Skill Badge (Simulated)
+            Award AI-Powered Badge
           </Button>
       </CardFooter>
     </Card>

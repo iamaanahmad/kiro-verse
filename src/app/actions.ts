@@ -2,10 +2,10 @@
 
 import { getCodeFeedback as getCodeFeedbackFlow } from '@/ai/flows/get-code-feedback';
 import { sendChatMessage as sendChatMessageFlow } from '@/ai/flows/send-chat-message';
+import { awardSkillBadge as awardSkillBadgeFlow } from '@/ai/flows/award-skill-badge';
 import { adminDb } from '@/lib/firebase/admin';
 import type { Badge } from '@/types';
 import { FieldValue } from 'firebase-admin/firestore';
-import { User } from 'firebase/auth';
 
 export async function getCodeFeedbackAction(code: string): Promise<string> {
   try {
@@ -43,34 +43,23 @@ export async function getUserBadges(userId: string): Promise<Badge[]> {
   }
 }
 
-export async function mintSkillBadgeAction(userId: string): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
+// This function is now more generic and can be reused.
+export async function mintSkillBadgeAction(userId: string, badgeDetails: Omit<Badge, 'id' | 'txHash' | 'date'>): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
   if (!userId) {
     return { success: false, error: 'User not authenticated.' };
   }
 
   try {
-    // In a real app, you'd verify the user's ID token here.
-    // const decodedToken = await adminAuth.verifyIdToken(idToken);
-    // const userId = decodedToken.uid;
-
     const userRef = adminDb.collection('users').doc(userId);
-
-    // This is a simulated minting process.
-    // In a real Web3 app, you would use ethers.js to interact with a smart contract.
-    // e.g., const contract = new ethers.Contract(contractAddress, abi, signer);
-    // const tx = await contract.mint(walletAddress, tokenId);
-    // await tx.wait();
-    // const txHash = tx.hash;
-
     const simulatedTxHash = `0x${[...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
 
     const newBadge: Badge = {
-      id: `python-basics-${Date.now()}`,
-      name: 'Python Basics',
-      description: 'Awarded for demonstrating foundational Python knowledge.',
+      id: `${badgeDetails.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+      name: badgeDetails.name,
+      description: badgeDetails.description,
+      icon: badgeDetails.icon,
       txHash: simulatedTxHash,
       date: new Date().toISOString(),
-      icon: 'Code',
     };
 
     await userRef.set({
@@ -83,4 +72,34 @@ export async function mintSkillBadgeAction(userId: string): Promise<{ success: b
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during minting.";
     return { success: false, error: `Failed to mint badge: ${errorMessage}` };
   }
+}
+
+
+export async function awardSkillBadgeAction(userId: string, code: string): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
+    if (!userId) {
+        return { success: false, error: 'User not authenticated.' };
+    }
+    if (!code.trim()) {
+        return { success: false, error: 'Cannot award badge for empty code.' };
+    }
+
+    try {
+        // 1. Get badge details from AI
+        const aiResult = await awardSkillBadgeFlow({ code });
+        const { badgeName, badgeDescription, badgeIcon } = aiResult;
+        
+        // 2. Mint the badge with the dynamic details
+        const mintResult = await mintSkillBadgeAction(userId, {
+            name: badgeName,
+            description: badgeDescription,
+            icon: badgeIcon,
+        });
+
+        return mintResult;
+
+    } catch (error) {
+        console.error('Error in awardSkillBadgeAction:', error);
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during the process.";
+        return { success: false, error: `Failed to award badge: ${errorMessage}` };
+    }
 }
