@@ -31,27 +31,27 @@
     --chart-5: 27 87% 67%;
   }
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --background: 222 79% 12%; /* Deep space blue */
+    --foreground: 210 40% 98%; /* Light text for contrast */
+    --card: 222 70% 16%; /* Slightly lighter card background */
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 70% 16%;
     --popover-foreground: 210 40% 98%;
-    --primary: 202 69% 83.3%;
-    --primary-foreground: 202 30% 25%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 262 100% 77%; /* Vibrant purple/magenta for primary actions */
+    --primary-foreground: 262 85% 20%;
+    --secondary: 222 60% 22%; /* A secondary, lighter blue */
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 222 60% 22%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 33 100% 64.1%;
-    --accent-foreground: 24 9.8% 10%;
-    --destructive: 0 62.8% 30.6%;
+    --accent: 172 100% 50%; /* Bright cyan/teal for accents */
+    --accent-foreground: 172 85% 15%;
+    --destructive: 0 74% 52%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
+    --border: 222 60% 25%;
+    --input: 222 60% 25%;
+    --ring: 262 100% 77%;
+    --chart-1: 262 100% 77%;
+    --chart-2: 172 100% 50%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
