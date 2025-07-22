@@ -5,13 +5,40 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Award, Loader2 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import KiroSpecDisplay from "./KiroSpecDisplay";
 
 interface BadgesDisplayProps {
   badges: Badge[];
   onAwardBadge: () => void;
   isLoading: boolean;
 }
+
+const awardBadgeSpec = {
+  requirements: `
+- The user's code must be analyzed by an AI to identify a specific, verifiable skill.
+- Based on the analysis, a unique skill badge must be generated, including a name, description, and a custom icon.
+- The generated icon must be a unique image created by a multimodal AI model.
+- The badge must be "minted" and saved to the user's profile, including a simulated transaction hash for authenticity.
+- The user should be able to see the process (spec) that the AI follows to complete this task.
+  `,
+  design: `
+- An overarching 'awardSkillBadgeAction' server action will orchestrate the entire process.
+- This action first calls the 'awardSkillBadgeFlow' to get the badge name and description from the user's code.
+- It then calls a separate 'generateBadgeIconFlow', which uses a multimodal image generation model to create a unique icon based on the badge name. This serves as an agent hook.
+- The final badge data, including the AI-generated details and a simulated transaction hash, is saved to the user's Firestore document.
+- The frontend 'BadgesDisplay' component will trigger this action and display the spec in a dialog, showing the user the 'Requirements -> Design -> Tasks' flow.
+- The UI will display the minted badges in a detailed list, including the icon, name, description, and transaction hash.
+  `,
+  tasks: `
+1.  **Backend:** Create 'awardSkillBadgeFlow' to analyze code and determine badge details.
+2.  **Backend:** Create 'generateBadgeIconFlow' to generate a unique image icon (multimodal AI).
+3.  **Backend:** Create 'awardSkillBadgeAction' to orchestrate the two flows and save the final badge to Firestore.
+4.  **Frontend:** Create 'KiroSpecDisplay' component to visualize the spec.
+5.  **Frontend:** Integrate 'KiroSpecDisplay' into 'BadgesDisplay' component.
+6.  **Frontend:** Update the UI to show a detailed list of badges with their transaction hashes.
+7.  **Frontend:** Trigger the end-to-end process from a single button click.
+  `,
+};
 
 export default function BadgesDisplay({ badges, onAwardBadge, isLoading }: BadgesDisplayProps) {
   return (
@@ -26,43 +53,43 @@ export default function BadgesDisplay({ badges, onAwardBadge, isLoading }: Badge
       <CardContent className="flex-grow overflow-hidden">
         <ScrollArea className="h-full pr-4">
           {isLoading && badges.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground"/>
+            <div className="flex flex-col items-center justify-center h-full text-center">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mb-2"/>
+                <p className="text-sm text-muted-foreground">Analyzing code and minting your first badge...</p>
             </div>
           ) : badges.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-4">
+            <div className="space-y-4">
               {badges.map((badge) => (
-                <TooltipProvider key={badge.id}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="flex flex-col items-center space-y-2 p-2 rounded-lg border bg-secondary/50 hover:bg-secondary transition-colors">
-                                <div className="p-1 bg-primary/20 rounded-full">
-                                    <img src={badge.icon} alt={`${badge.name} icon`} className="w-10 h-10 rounded-full" />
-                                </div>
-                                <p className="text-xs font-medium text-center truncate w-full">{badge.name}</p>
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                            <p className="font-semibold">{badge.name}</p>
-                            <p className="text-xs text-muted-foreground">{badge.description}</p>
-                            <p className="text-xs text-muted-foreground mt-1 font-mono">Minted: {new Date(badge.date).toLocaleDateString()}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                <div key={badge.id} className="flex items-start gap-4 p-3 rounded-lg border bg-secondary/50">
+                    <img src={badge.icon} alt={`${badge.name} icon`} className="w-12 h-12 rounded-md border" />
+                    <div className="flex-1">
+                        <p className="font-semibold text-foreground">{badge.name}</p>
+                        <p className="text-xs text-muted-foreground">{badge.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1 font-mono break-all">
+                            TX: {badge.txHash}
+                        </p>
+                    </div>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground text-sm">No badges earned yet.</p>
+            <div className="flex items-center justify-center h-full text-center">
+              <p className="text-muted-foreground text-sm">No badges earned yet. <br />Click below to mint your first one!</p>
             </div>
           )}
         </ScrollArea>
       </CardContent>
       <CardFooter>
-         <Button onClick={onAwardBadge} disabled={isLoading} className="w-full">
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Award className="mr-2 h-4 w-4" />}
-            Award AI-Powered Badge
-          </Button>
+         <KiroSpecDisplay
+            title="AI-Powered Badge Award"
+            spec={awardBadgeSpec}
+            trigger={
+                <Button onClick={onAwardBadge} disabled={isLoading} className="w-full">
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Award className="mr-2 h-4 w-4" />}
+                    Award AI-Powered Badge
+                </Button>
+            }
+        />
       </CardFooter>
     </Card>
   );

@@ -99,7 +99,7 @@ export default function KiroApp({ user }: KiroAppProps) {
     setIsLoading(prev => ({ ...prev, badges: true }));
     const result = await awardSkillBadgeAction(user.uid, codeContent);
     if (result.success && result.badge) {
-      setUserBadges(prev => [...prev, result.badge!]);
+      setUserBadges(prev => [result.badge!, ...prev]); // Add new badge to the top
       toast({
         title: 'Badge Awarded!',
         description: `Your "${result.badge.name}" badge has been minted.`,
@@ -128,8 +128,8 @@ export default function KiroApp({ user }: KiroAppProps) {
         <Button variant="outline" size="sm" onClick={handleSignOut}>Sign Out</Button>
       </header>
       <main className="flex-grow p-4 md:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
-          <div className="md:col-span-12 lg:col-span-5 xl:col-span-4">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full">
+          <div className="xl:col-span-5">
             <CodeEditor
               code={codeContent}
               onCodeChange={setCodeContent}
@@ -138,14 +138,14 @@ export default function KiroApp({ user }: KiroAppProps) {
               isLoading={isLoading.feedback}
             />
           </div>
-          <div className="md:col-span-6 lg:col-span-7 xl:col-span-5">
+          <div className="xl:col-span-4">
             <ChatInterface
               messages={chatMessages}
               onSendMessage={handleSendChatMessage}
               isLoading={isLoading.chat}
             />
           </div>
-          <div className="md:col-span-6 lg:col-span-12 xl:col-span-3">
+          <div className="xl:col-span-3">
              <BadgesDisplay
               badges={userBadges}
               onAwardBadge={handleAwardBadge}
