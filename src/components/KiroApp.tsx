@@ -129,7 +129,7 @@ export default function KiroApp({ user }: KiroAppProps) {
       </header>
       <main className="flex-grow p-4 md:p-6">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full">
-          <div className="xl:col-span-5">
+          <div className="xl:col-span-6">
             <CodeEditor
               code={codeContent}
               onCodeChange={setCodeContent}
@@ -138,7 +138,7 @@ export default function KiroApp({ user }: KiroAppProps) {
               isLoading={isLoading.feedback}
             />
           </div>
-          <div className="xl:col-span-4">
+          <div className="xl:col-span-3">
             <ChatInterface
               messages={chatMessages}
               onSendMessage={handleSendChatMessage}
