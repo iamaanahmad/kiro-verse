@@ -85,7 +85,7 @@ export default function ChatInterface({ messages, onSendMessage, isLoading }: Ch
             disabled={isLoading}
             aria-label="Chat Input"
           />
-          <Button type="submit" disabled={isLoading || !input.trim()} size="icon" className="flex-shrink-0 bg-accent hover:bg-accent/90">
+          <Button type="submit" disabled={isLoading || !input.trim()} size="icon" className="flex-shrink-0 bg-accent hover:bg-accent/90" aria-label="Send Message">
             <Send className="h-4 w-4" />
           </Button>
         </form>
