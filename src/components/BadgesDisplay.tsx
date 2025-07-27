@@ -46,7 +46,7 @@ export default function BadgesDisplay({ badges, onAwardBadge, isLoading }: Badge
     <Card className="h-full flex flex-col shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-headline">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-award"><path d="M12 20h.01"/><path d="M11.5 3.5a8.5 8.5 0 0 0-5.4 14.5"/><path d="M12.5 3.5a8.5 8.5 0 0 1 5.4 14.5"/><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            <Award className="h-6 w-6"/>
             Your Skill Badges
         </CardTitle>
         <CardDescription>Showcase your verified Web3 achievements.</CardDescription>

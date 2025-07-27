@@ -5,7 +5,7 @@ import { signInAnonymously } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Bot, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
@@ -33,7 +33,7 @@ export default function Auth() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/20 text-primary rounded-full p-3 w-fit mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <Bot className="h-8 w-8" />
           </div>
           <CardTitle className="text-2xl font-headline">Welcome to KiroVerse</CardTitle>
           <CardDescription>Your personal AI code mentor and Web3 skill hub.</CardDescription>

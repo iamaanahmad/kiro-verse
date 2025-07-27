@@ -13,7 +13,7 @@ import {
   awardSkillBadgeAction,
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Bot, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
@@ -122,14 +122,14 @@ export default function KiroApp({ user }: KiroAppProps) {
     <div className="flex flex-col min-h-screen bg-background">
        <header className="sticky top-0 z-10 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-sm">
          <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot text-primary"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            <Bot className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-headline font-semibold text-foreground">KiroVerse</h1>
          </div>
         <Button variant="outline" size="sm" onClick={handleSignOut}>Sign Out</Button>
       </header>
       <main className="flex-grow p-4 md:p-6">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full">
-          <div className="xl:col-span-6">
+          <div className="xl:col-span-7">
             <CodeEditor
               code={codeContent}
               onCodeChange={setCodeContent}
@@ -138,19 +138,19 @@ export default function KiroApp({ user }: KiroAppProps) {
               isLoading={isLoading.feedback}
             />
           </div>
-          <div className="xl:col-span-3">
-            <ChatInterface
-              messages={chatMessages}
-              onSendMessage={handleSendChatMessage}
-              isLoading={isLoading.chat}
-            />
-          </div>
-          <div className="xl:col-span-3">
-             <BadgesDisplay
-              badges={userBadges}
-              onAwardBadge={handleAwardBadge}
-              isLoading={isLoading.badges}
-            />
+          <div className="xl:col-span-5">
+             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-6">
+                <ChatInterface
+                messages={chatMessages}
+                onSendMessage={handleSendChatMessage}
+                isLoading={isLoading.chat}
+                />
+                <BadgesDisplay
+                badges={userBadges}
+                onAwardBadge={handleAwardBadge}
+                isLoading={isLoading.badges}
+                />
+            </div>
           </div>
         </div>
       </main>

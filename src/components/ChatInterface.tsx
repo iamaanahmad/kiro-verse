@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, MessageCircleQuestion } from "lucide-react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +40,7 @@ export default function ChatInterface({ messages, onSendMessage, isLoading }: Ch
     <Card className="h-full flex flex-col shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-headline">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle-question"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2z"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          <MessageCircleQuestion className="h-6 w-6" />
           Chat with Kiro
         </CardTitle>
         <CardDescription>Ask your AI mentor questions about your code.</CardDescription>

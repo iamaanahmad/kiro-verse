@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Sparkles } from "lucide-react";
+import { CodeXml, Loader2, Sparkles } from "lucide-react";
 import KiroSpecDisplay from "./KiroSpecDisplay";
 
 interface CodeEditorProps {
@@ -49,7 +49,7 @@ export default function CodeEditor({ code, onCodeChange, onGetFeedback, aiFeedba
     <Card className="h-full flex flex-col shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-headline">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-code-xml"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+          <CodeXml className="h-6 w-6" />
           Code Editor
         </CardTitle>
         <CardDescription>Write or paste your code here to get AI-powered feedback.</CardDescription>
