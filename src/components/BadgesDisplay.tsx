@@ -5,9 +5,10 @@ import type { Badge } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Award, Loader2 } from "lucide-react";
+import { Award, Loader2, ExternalLink } from "lucide-react";
 import KiroSpecDisplay from "./KiroSpecDisplay";
-import { ExternalLink } from "lucide-react";
+import { Badge as BadgeCount } from "@/components/ui/badge";
+
 
 interface BadgesDisplayProps {
   badges: Badge[];
@@ -45,11 +46,19 @@ export default function BadgesDisplay({ badges, onAwardBadge, isLoading }: Badge
   return (
     <Card className="h-full flex flex-col shadow-md">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-headline">
-            <Award className="h-6 w-6"/>
-            Your Skill Badges
-        </CardTitle>
-        <CardDescription>Showcase your verified Web3 achievements.</CardDescription>
+        <div className="flex justify-between items-start">
+            <div className="flex-1">
+                <CardTitle className="flex items-center gap-2 font-headline">
+                    <Award className="h-6 w-6"/>
+                    Your Skill Badges
+                </CardTitle>
+                <CardDescription>Showcase your verified Web3 achievements.</CardDescription>
+            </div>
+             <div className="text-right">
+                <div className="text-sm font-medium text-muted-foreground">Total Badges</div>
+                <BadgeCount variant="secondary" className="text-lg font-bold">{badges.length}</BadgeCount>
+            </div>
+        </div>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden">
         <ScrollArea className="h-full pr-4">
