@@ -7,6 +7,13 @@ import { generateBadgeIcon as generateBadgeIconFlow } from '@/ai/flows/generate-
 import { adminDb } from '@/lib/firebase/admin';
 import type { Badge } from '@/types';
 import { FieldValue } from 'firebase-admin/firestore';
+import { ethers } from 'ethers';
+
+// A simple ABI for our NFT contract's mint function
+const nftContractAbi = [
+  "function mintBadge(address to, string memory tokenURI) public returns (uint256)"
+];
+
 
 export async function getCodeFeedbackAction(code: string): Promise<string> {
   try {
@@ -35,7 +42,7 @@ export async function getUserBadges(userId: string): Promise<Badge[]> {
   try {
     const userDoc = await adminDb.collection('users').doc(userId).get();
     if (userDoc.exists) {
-      return (userDoc.data()?.badges || []) as Badge[];
+      return (userDoc.data()?.badges || []).sort((a: Badge, b: Badge) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }
     return [];
   } catch (error) {
@@ -48,17 +55,52 @@ export async function mintSkillBadgeAction(userId: string, badgeDetails: Omit<Ba
   if (!userId) {
     return { success: false, error: 'User not authenticated.' };
   }
+  
+  if (!process.env.SEPOLIA_RPC_URL || !process.env.SERVER_WALLET_PRIVATE_KEY || !process.env.NFT_CONTRACT_ADDRESS) {
+      console.error("Missing required environment variables for minting.");
+      return { success: false, error: "Server configuration error: Minting service is not available." };
+  }
 
   try {
-    const userRef = adminDb.collection('users').doc(userId);
-    const simulatedTxHash = `0x${[...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    // 1. Set up blockchain provider and wallet
+    const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+    const wallet = new ethers.Wallet(process.env.SERVER_WALLET_PRIVATE_KEY, provider);
+    const nftContract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, nftContractAbi, wallet);
 
+    // 2. Create metadata for the NFT
+    const tokenMetadata = {
+      name: badgeDetails.name,
+      description: badgeDetails.description,
+      image: badgeDetails.icon,
+      attributes: [
+        { "trait_type": "Skill", "value": "Programming" },
+        { "trait_type": "Awarded To", "value": userId }
+      ]
+    };
+    const tokenURI = `data:application/json;base64,${Buffer.from(JSON.stringify(tokenMetadata)).toString('base64')}`;
+    
+    // 3. Mint the NFT on the Sepolia testnet
+    const tx = await nftContract.mintBadge(wallet.address, tokenURI); // Minting to server's own address for demo
+    console.log(`Minting transaction sent: ${tx.hash}`);
+    
+    // 4. Wait for the transaction to be mined
+    const receipt = await tx.wait();
+    console.log(`Transaction mined in block: ${receipt.blockNumber}`);
+
+    if (!receipt.hash) {
+        throw new Error("Transaction failed: No transaction hash returned.");
+    }
+    
+    const realTxHash = receipt.hash;
+
+    // 5. Save the badge details to Firestore with the real transaction hash
+    const userRef = adminDb.collection('users').doc(userId);
     const newBadge: Badge = {
       id: `${badgeDetails.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
       name: badgeDetails.name,
       description: badgeDetails.description,
       icon: badgeDetails.icon,
-      txHash: simulatedTxHash,
+      txHash: realTxHash,
       date: new Date().toISOString(),
     };
 
@@ -66,7 +108,8 @@ export async function mintSkillBadgeAction(userId: string, badgeDetails: Omit<Ba
         badges: FieldValue.arrayUnion(newBadge)
     }, { merge: true });
 
-    return { success: true, txHash: simulatedTxHash, badge: newBadge };
+    return { success: true, txHash: realTxHash, badge: newBadge };
+
   } catch (error) {
     console.error('Error minting badge:', error);
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during minting.";

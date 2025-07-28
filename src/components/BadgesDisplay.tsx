@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Award, Loader2 } from "lucide-react";
 import KiroSpecDisplay from "./KiroSpecDisplay";
+import { ExternalLink } from "lucide-react";
 
 interface BadgesDisplayProps {
   badges: Badge[];
@@ -19,25 +20,24 @@ const awardBadgeSpec = {
 - The user's code must be analyzed by an AI to identify a specific, verifiable skill.
 - Based on the analysis, a unique skill badge must be generated, including a name, description, and a custom icon.
 - The generated icon must be a unique image created by a multimodal AI model.
-- The badge must be "minted" and saved to the user's profile, including a simulated transaction hash for authenticity.
-- The user should be able to see the process (spec) that the AI follows to complete this task.
+- The badge must be minted as a real NFT on a public testnet (Sepolia) and saved to the user's profile.
+- The user should be able to verify the transaction on a blockchain explorer.
   `,
   design: `
-- An overarching 'awardSkillBadgeAction' server action will orchestrate the entire process.
-- This action first calls the 'awardSkillBadgeFlow' to get the badge name and description from the user's code.
-- It then calls a separate 'generateBadgeIconFlow', which uses a multimodal image generation model to create a unique icon based on the badge name. This serves as an agent hook.
-- The final badge data, including the AI-generated details and a simulated transaction hash, is saved to the user's Firestore document.
-- The frontend 'BadgesDisplay' component will trigger this action and display the spec in a dialog, showing the user the 'Requirements -> Design -> Tasks' flow.
-- The UI will display the minted badges in a detailed list, including the icon, name, description, and transaction hash.
+- An 'awardSkillBadgeAction' server action orchestrates the entire process.
+- It first calls 'awardSkillBadgeFlow' to get the badge name and description.
+- It then calls a separate 'generateBadgeIconFlow' to create a unique icon.
+- Finally, it calls the 'mintSkillBadgeAction', which uses the 'ethers' library to connect to the Sepolia testnet.
+- This action crafts a JSON metadata file for the NFT, mints it to a server-controlled wallet, and returns the real transaction hash.
+- The UI will display the minted badges and provide a direct link to the transaction on Etherscan for verification.
   `,
   tasks: `
-1.  **Backend:** Create 'awardSkillBadgeFlow' to analyze code and determine badge details.
-2.  **Backend:** Create 'generateBadgeIconFlow' to generate a unique image icon (multimodal AI).
-3.  **Backend:** Create 'awardSkillBadgeAction' to orchestrate the two flows and save the final badge to Firestore.
-4.  **Frontend:** Create 'KiroSpecDisplay' component to visualize the spec.
-5.  **Frontend:** Integrate 'KiroSpecDisplay' into 'BadgesDisplay' component.
-6.  **Frontend:** Update the UI to show a detailed list of badges with their transaction hashes.
-7.  **Frontend:** Trigger the end-to-end process from a single button click.
+1.  **Backend:** Create 'awardSkillBadgeFlow' to analyze code.
+2.  **Backend:** Create 'generateBadgeIconFlow' for image generation.
+3.  **Backend:** Implement 'mintSkillBadgeAction' with 'ethers' to mint an NFT on Sepolia.
+4.  **Backend:** Use environment variables for RPC URL, private key, and contract address.
+5.  **Frontend:** Update 'BadgesDisplay' to link the transaction hash to Etherscan.
+6.  **Frontend:** Ensure the UI clearly shows the verification link.
   `,
 };
 
@@ -56,7 +56,7 @@ export default function BadgesDisplay({ badges, onAwardBadge, isLoading }: Badge
           {isLoading && badges.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mb-2"/>
-                <p className="text-sm text-muted-foreground">Analyzing code and minting your first badge...</p>
+                <p className="text-sm text-muted-foreground">Analyzing code and minting your first badge on the blockchain...</p>
             </div>
           ) : badges.length > 0 ? (
             <div className="space-y-4">
@@ -66,9 +66,15 @@ export default function BadgesDisplay({ badges, onAwardBadge, isLoading }: Badge
                     <div className="flex-1">
                         <p className="font-semibold text-foreground">{badge.name}</p>
                         <p className="text-xs text-muted-foreground">{badge.description}</p>
-                        <p className="text-xs text-muted-foreground mt-1 font-mono break-all">
-                            TX: {badge.txHash}
-                        </p>
+                        <a 
+                            href={`https://sepolia.etherscan.io/tx/${badge.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-accent-foreground/80 hover:text-accent-foreground hover:underline inline-flex items-center gap-1 mt-1 font-mono break-all"
+                        >
+                            <span>TX: {badge.txHash.substring(0,10)}...{badge.txHash.substring(badge.txHash.length - 8)}</span>
+                            <ExternalLink className="h-3 w-3" />
+                        </a>
                     </div>
                 </div>
               ))}
