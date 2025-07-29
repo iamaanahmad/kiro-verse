@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
 import { FileText, DraftingCompass, ListChecks } from "lucide-react";
+import React from "react";
 
 interface KiroSpecDisplayProps {
   title: string;
@@ -26,6 +27,22 @@ interface KiroSpecDisplayProps {
   };
   trigger: React.ReactNode;
 }
+
+// A simple component to render text with markdown-like bolding.
+const MarkdownContent = ({ content }: { content: string }) => {
+    const parts = content.trim().split(/(\*\*.*?\*\*)/g);
+    return (
+        <div className="text-sm whitespace-pre-wrap font-sans text-muted-foreground">
+            {parts.map((part, index) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={index} className="font-semibold text-foreground/90">{part.slice(2, -2)}</strong>;
+                }
+                return <React.Fragment key={index}>{part}</React.Fragment>;
+            })}
+        </div>
+    );
+};
+
 
 export default function KiroSpecDisplay({ title, spec, trigger }: KiroSpecDisplayProps) {
   return (
@@ -46,14 +63,14 @@ export default function KiroSpecDisplay({ title, spec, trigger }: KiroSpecDispla
               <TabsTrigger value="tasks"><ListChecks className="mr-2"/>Tasks</TabsTrigger>
             </TabsList>
             <ScrollArea className="h-72 mt-4 pr-4">
-                 <TabsContent value="requirements">
-                    <pre className="text-sm whitespace-pre-wrap font-sans text-muted-foreground">{spec.requirements.trim()}</pre>
+                <TabsContent value="requirements">
+                    <MarkdownContent content={spec.requirements} />
                 </TabsContent>
                 <TabsContent value="design">
-                    <pre className="text-sm whitespace-pre-wrap font-sans text-muted-foreground">{spec.design.trim()}</pre>
+                    <MarkdownContent content={spec.design} />
                 </TabsContent>
                 <TabsContent value="tasks">
-                    <pre className="text-sm whitespace-pre-wrap font-sans text-muted-foreground">{spec.tasks.trim()}</pre>
+                    <MarkdownContent content={spec.tasks} />
                 </TabsContent>
             </ScrollArea>
           </Tabs>
