@@ -33,12 +33,12 @@ const awardBadgeSpec = {
 - The UI will display the minted badges and provide a direct link to the transaction on Etherscan for verification.
   `,
   tasks: `
-1.  **Backend:** Create 'awardSkillBadgeFlow' to analyze code.
-2.  **Backend:** Create 'generateBadgeIconFlow' for image generation.
-3.  **Backend:** Implement 'mintSkillBadgeAction' with 'ethers' to mint an NFT on Sepolia.
-4.  **Backend:** Use environment variables for RPC URL, private key, and contract address.
-5.  **Frontend:** Update 'BadgesDisplay' to link the transaction hash to Etherscan.
-6.  **Frontend:** Ensure the UI clearly shows the verification link.
+  1. **Backend:** Create 'awardSkillBadgeFlow' to analyze code.
+  2. **Backend:** Create 'generateBadgeIconFlow' for image generation.
+  3. **Backend:** Implement 'mintSkillBadgeAction' with 'ethers' to mint an NFT on Sepolia.
+  4. **Backend:** Use environment variables for RPC URL, private key, and contract address.
+  5. **Frontend:** Update 'BadgesDisplay' to link the transaction hash to Etherscan.
+  6. **Frontend:** Ensure the UI clearly shows the verification link.
   `,
 };
 

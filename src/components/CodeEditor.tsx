@@ -32,15 +32,15 @@ const codeFeedbackSpec = {
 - When the "Get AI Code Feedback" button is clicked, it will call the server action, display a loading indicator, and then show the returned feedback in a designated area.
   `,
   tasks: `
-1.  **Backend:** Create 'src/ai/flows/get-code-feedback.ts' with the 'getCodeFeedbackFlow'.
-2.  **Backend:** Define input (z.object({ code: z.string() })) and output (z.object({ feedback: z.string() })) schemas.
-3.  **Backend:** Write the prompt for Kiro's persona and instructions.
-4.  **Backend:** Create 'getCodeFeedbackAction' in 'src/app/actions.ts' to invoke the flow.
-5.  **Frontend:** Add 'aiFeedback' and 'isLoading' state to the 'KiroApp' component.
-6.  **Frontend:** Pass state and the handler function to the 'CodeEditor' component.
-7.  **Frontend:** In 'CodeEditor', add a ScrollArea to display the feedback text.
-8.  **Frontend:** Implement the 'onGetFeedback' handler to call the server action and update state.
-9.  **Frontend:** Display a loader while the feedback is being generated.
+  1. **Backend:** Create 'src/ai/flows/get-code-feedback.ts' with the 'getCodeFeedbackFlow'.
+  2. **Backend:** Define input (z.object({ code: z.string() })) and output (z.object({ feedback: z.string() })) schemas.
+  3. **Backend:** Write the prompt for Kiro's persona and instructions.
+  4. **Backend:** Create 'getCodeFeedbackAction' in 'src/app/actions.ts' to invoke the flow.
+  5. **Frontend:** Add 'aiFeedback' and 'isLoading' state to the 'KiroApp' component.
+  6. **Frontend:** Pass state and the handler function to the 'CodeEditor' component.
+  7. **Frontend:** In 'CodeEditor', add a ScrollArea to display the feedback text.
+  8. **Frontend:** Implement the 'onGetFeedback' handler to call the server action and update state.
+  9. **Frontend:** Display a loader while the feedback is being generated.
   `,
 };
 
