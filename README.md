@@ -391,7 +391,7 @@ We welcome contributions! See our [Contributing Guide](.github/CONTRIBUTING.md) 
 ### Development Setup
 ```bash
 # Fork and clone the repo
-git clone https://github.com/yourusername/kiroverse.git
+git clone https://github.com/iamaanahmad/kiro-verse.git
 
 # Create a feature branch
 git checkout -b feature/amazing-feature
@@ -422,7 +422,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact & Links
 
-- **Demo**: [kiroverse.vercel.app](https://kiroverse.vercel.app)
+- **Demo**: [kiro-verse.appwrite.network](https://kiro-verse.appwrite.network)
 - **Documentation**: [docs.kiroverse.dev](https://docs.kiroverse.dev)
 - **Twitter**: [@KiroVerse](https://twitter.com/kiroverse)
 - **Discord**: [Join our community](https://discord.gg/kiroverse)
@@ -435,6 +435,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *Where AI mentorship meets blockchain verification*
 
-[🚀 Try KiroVerse Now](https://kiroverse.vercel.app) | [📖 Read the Docs](https://docs.kiroverse.dev) | [🎥 Watch Demo](https://youtube.com/watch?v=demo)
+[🚀 Try KiroVerse Now](https://kiro-verse.appwrite.network) | [📖 Read the Docs](https://docs.kiroverse.dev) | [🎥 Watch Demo](https://youtube.com/watch?v=demo)
 
 </div>
