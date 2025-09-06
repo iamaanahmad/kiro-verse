@@ -6,15 +6,18 @@ import type { ChatMessage, Badge } from '@/types';
 import CodeEditor from './CodeEditor';
 import ChatInterface from './ChatInterface';
 import BadgesDisplay from './BadgesDisplay';
+import DemoModeToggle from './DemoModeToggle';
 import {
   getCodeFeedbackAction,
   sendChatMessageAction,
   getUserBadges,
   awardSkillBadgeAction,
+  getDemoMode,
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Loader2 } from 'lucide-react';
+import { Bot, Loader2, Settings } from 'lucide-react';
 import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
 
@@ -63,18 +66,23 @@ export default function KiroApp({ user }: KiroAppProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(initialMessages);
   const [aiFeedback, setAiFeedback] = useState('');
   const [userBadges, setUserBadges] = useState<Badge[]>([]);
+  const [demoMode, setDemoMode] = useState(true);
   const [isLoading, setIsLoading] = useState({ feedback: false, chat: false, badges: false });
 
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchBadges = async () => {
+    const fetchInitialData = async () => {
       setIsLoading(prev => ({ ...prev, badges: true }));
-      const badges = await getUserBadges(user.uid);
+      const [badges, currentDemoMode] = await Promise.all([
+        getUserBadges(user.uid),
+        getDemoMode(user.uid)
+      ]);
       setUserBadges(badges);
+      setDemoMode(currentDemoMode);
       setIsLoading(prev => ({ ...prev, badges: false }));
     };
-    fetchBadges();
+    fetchInitialData();
   }, [user.uid]);
 
   const handleGetCodeFeedback = async () => {
@@ -97,12 +105,14 @@ export default function KiroApp({ user }: KiroAppProps) {
 
   const handleAwardBadge = async () => {
     setIsLoading(prev => ({ ...prev, badges: true }));
-    const result = await awardSkillBadgeAction(user.uid, codeContent);
+    const result = await awardSkillBadgeAction(user.uid, codeContent, demoMode);
     if (result.success && result.badge) {
       setUserBadges(prev => [result.badge!, ...prev]); // Add new badge to the top
       toast({
         title: 'Badge Awarded!',
-        description: `Your "${result.badge.name}" badge has been minted.`,
+        description: demoMode 
+          ? `Your "${result.badge.name}" badge has been created (Demo Mode)`
+          : `Your "${result.badge.name}" badge has been minted on Sepolia blockchain!`,
       });
     } else {
       toast({
@@ -113,6 +123,10 @@ export default function KiroApp({ user }: KiroAppProps) {
     }
     setIsLoading(prev => ({ ...prev, badges: false }));
   };
+
+  const handleDemoModeChange = (newDemoMode: boolean) => {
+    setDemoMode(newDemoMode);
+  };
   
   const handleSignOut = async () => {
     await signOut(auth);
@@ -120,16 +134,48 @@ export default function KiroApp({ user }: KiroAppProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-       <header className="sticky top-0 z-10 flex items-center justify-between p-4 border-b bg-background/80 backdrop-blur-sm">
-         <div className="flex items-center gap-2">
-            <Bot className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-headline font-semibold text-foreground">KiroVerse</h1>
+       <header className="sticky top-0 z-10 flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur-md shadow-sm">
+         <div className="flex items-center gap-3 animate-slide-in-left">
+            <div className="relative">
+              <Bot className="h-7 w-7 text-primary animate-pulse" />
+              <div className="absolute -inset-1 bg-primary/20 rounded-full animate-ping opacity-75"></div>
+            </div>
+            <div>
+              <h1 className="text-xl font-headline font-bold gradient-text">KiroVerse</h1>
+              <p className="text-xs text-muted-foreground">AI Code Mentor & Web3 Skills</p>
+            </div>
          </div>
-        <Button variant="outline" size="sm" onClick={handleSignOut}>Sign Out</Button>
+         <div className="flex items-center gap-3 animate-slide-in-right">
+           <Dialog>
+             <DialogTrigger asChild>
+               <Button variant="outline" size="sm" className="hover-lift transition-all duration-200">
+                 <Settings className="h-4 w-4 mr-2" />
+                 <span className="hidden sm:inline">{demoMode ? "Demo Mode" : "Production"}</span>
+                 <span className="sm:hidden">{demoMode ? "Demo" : "Prod"}</span>
+               </Button>
+             </DialogTrigger>
+             <DialogContent className="sm:max-w-md">
+               <DialogHeader>
+                 <DialogTitle>Badge Minting Mode</DialogTitle>
+                 <DialogDescription>
+                   Choose between demo mode (instant mock badges) or production mode (real blockchain NFTs).
+                 </DialogDescription>
+               </DialogHeader>
+               <DemoModeToggle 
+                 userId={user.uid} 
+                 onModeChange={handleDemoModeChange}
+               />
+             </DialogContent>
+           </Dialog>
+           <Button variant="outline" size="sm" onClick={handleSignOut} className="hover-lift transition-all duration-200">
+             <span className="hidden sm:inline">Sign Out</span>
+             <span className="sm:hidden">Exit</span>
+           </Button>
+         </div>
       </header>
-      <main className="flex-grow p-4 md:p-6">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full">
-          <div className="xl:col-span-7">
+      <main className="flex-grow p-4 md:p-6 animate-fade-in">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full max-w-7xl mx-auto">
+          <div className="xl:col-span-7 animate-slide-in-left">
             <CodeEditor
               code={codeContent}
               onCodeChange={setCodeContent}
@@ -138,18 +184,22 @@ export default function KiroApp({ user }: KiroAppProps) {
               isLoading={isLoading.feedback}
             />
           </div>
-          <div className="xl:col-span-5">
-             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-6">
-                <ChatInterface
-                messages={chatMessages}
-                onSendMessage={handleSendChatMessage}
-                isLoading={isLoading.chat}
-                />
-                <BadgesDisplay
-                badges={userBadges}
-                onAwardBadge={handleAwardBadge}
-                isLoading={isLoading.badges}
-                />
+          <div className="xl:col-span-5 animate-slide-in-right">
+             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-1 gap-6 h-full">
+                <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                  <ChatInterface
+                  messages={chatMessages}
+                  onSendMessage={handleSendChatMessage}
+                  isLoading={isLoading.chat}
+                  />
+                </div>
+                <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <BadgesDisplay
+                  badges={userBadges}
+                  onAwardBadge={handleAwardBadge}
+                  isLoading={isLoading.badges}
+                  />
+                </div>
             </div>
           </div>
         </div>

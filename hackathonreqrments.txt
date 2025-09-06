@@ -1,0 +1,54 @@
+KiroVerse project is extremely well aligned with the official “Code with Kiro Hackathon” requirements and judging criteria. Here’s the breakdown of key requirements and how your project matches them:
+
+📝 Official Requirements & Judging Criteria
+1. Must Build with Kiro
+Use Kiro’s developer tools, APIs, spec-driven agent flows, and showcase them clearly.
+KiroVerse:
+
+Deep integration of Kiro spec-driven workflow (requirements, design, tasks) with user-visible “Behind the Scenes” views.
+
+Extensive use of agent hooks and Genkit flows for real AI logic.
+
+2. Functional Application
+The solution must be installable, consistently runnable, and behave as shown in your demo/video.
+KiroVerse:
+
+Production-ready, deployed, with robust error handling and accessibility. All features described appear realized and tested.
+
+3. Project Category Alignment
+Accepts entries in “Educational Apps,” “Productivity & Workflow Tools,” or “Wildcard/Freestyle.”
+KiroVerse:
+
+Clearly belongs in Educational Apps, with elements that fit the Productivity & Workflow and Wildcard categories, giving flexibility in positioning.
+
+4. Demo Video
+Must include a public demo video (under 3 minutes), clearly showing how Kiro was used to build, automate, or accelerate features.
+KiroVerse:
+
+Your project summary suggests a clear, demo-friendly flow, easily organized to showcase Kiro’s value, AI agent orchestration, real blockchain minting, and spec-driven development.
+
+5. Public Open Source Code & .kiro Directory
+Submit a public repo with an OSI-approved license, explicit documentation, and a .kiro directory in the project root containing specs, hooks, and steering files.
+KiroVerse:
+
+Built with open source standards (TypeScript, Next.js) and strong documentation practices. Confirm your .kiro directory is present and well-documented.
+
+6. Describe Kiro Usage in Submission
+Include a writeup (in your Devpost, repo docs, and video) about how Kiro’s spec-driven approach, agent hooks, and automation shaped your development.
+KiroVerse:
+
+Spec-driven “Behind the Scenes” view, agent flows for chaining feedback and badge minting, and visible requirements/tasks all make for a compelling narrative.
+
+7. Judging Criteria:
+Potential Value: Wide usefulness, accessibility, real-world impact.
+
+Implementation: Strong use of Kiro, including specs, flows, agents, and automation.
+
+Quality of the Idea: Originality, creativity, unique technical integrations (e.g., using blockchain for verifiable credentials, multimodal icon generation, transparent AI).
+KiroVerse:
+
+High-value educational platform with portability, onboarding, mentorship, and professional achievement proof.
+
+Sophisticated Kiro implementation with visible workflow and agent orchestration.
+
+Uniquely creative with blockchain/NFT badges, multimodal AI, and transparent engineering.

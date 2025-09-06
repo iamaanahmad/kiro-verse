@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import '../styles/animations.css';
 import { cn } from '@/lib/utils';
 import { AuthProvider } from '@/lib/firebase/auth';
 import { Toaster } from '@/components/ui/toaster';

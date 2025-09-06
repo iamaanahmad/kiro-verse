@@ -1,0 +1,42 @@
+Here is a detailed summary of the KiroVerse project, including its features, implementations, and integrations.
+
+KiroVerse is an advanced, AI-powered interactive learning environment designed to help developers enhance their coding skills, receive intelligent mentorship, and earn real, verifiable credentials on the blockchain. It functions as a personal "code-dojo" where users can practice, get instant feedback, and have their achievements recognized with unique, AI-generated skill badges.
+
+AI-Powered Code Feedback:
+
+Users can write or paste code into the editor and receive a detailed analysis from an AI mentor named Kiro.
+The feedback covers code quality, potential errors, and suggestions for improvement, helping users learn best practices.
+Conversational AI Chat:
+
+A fully interactive chat interface allows users to ask Kiro specific questions about their code.
+The AI provides context-aware answers, acting as a Socratic-style tutor to guide the user's understanding.
+Real, Verifiable Skill Badges:
+
+This is the project's standout feature. When a user demonstrates a skill in their code, KiroVerse awards them a skill badge.
+Each badge is a real NFT (Non-Fungible Token) minted on the Sepolia public testnet, creating a permanent, verifiable credential that cannot be faked.
+The transaction hash for each badge is displayed and links directly to a blockchain explorer (Etherscan), allowing for third-party verification.
+Visible Spec-Driven Development:
+
+To make the AI's process transparent and educational, the app includes a "Behind the Scenes" view for major actions.
+This view shows the user the exact Requirements, Design, and Tasks the AI is following, demystifying the development process and reinforcing the principles of spec-driven engineering.
+AI & Generative SDK (Google's Genkit):
+
+Genkit Flows: The core logic is built as a series of Genkit flows:
+getCodeFeedbackFlow: Analyzes code and provides feedback.
+sendChatMessageFlow: Powers the conversational chat.
+awardSkillBadgeFlow: Analyzes code to determine the specific skill to award.
+generateBadgeIconFlow: A multimodal flow that generates a unique, vector-style icon for each badge.
+Agent Hooks & Multimodality: We implemented a powerful agent hook where the awardSkillBadgeFlow triggers the generateBadgeIconFlow. This uses Google's gemini-2.0-flash-preview-image-generation model to create a custom image from a text prompt, showcasing advanced multimodal AI capabilities.
+Blockchain & Web3 Integration:
+
+Ethers.js: The application uses the ethers library to connect to the Ethereum blockchain.
+Sepolia Testnet: All NFT badges are minted on the public Sepolia testnet, making them truly verifiable.
+Smart Contract Interaction: A server-side wallet interacts with a pre-deployed ERC-721 (NFT) smart contract on Sepolia to mint the badges.
+Environment-Driven Configuration: The connection to the blockchain is securely configured using environment variables (SEPOLIA_RPC_URL, SERVER_WALLET_PRIVATE_KEY, NFT_CONTRACT_ADDRESS).
+Tech Stack & Architecture:
+
+Framework: Next.js 15 with the App Router.
+Language: TypeScript.
+UI: Built with React, styled with Tailwind CSS, and utilizing the ShadCN UI component library for a polished, modern look.
+Backend & Auth: Firebase is used for anonymous user authentication and the Firestore database stores user profile information and metadata for the earned badges.
+Code Quality & Accessibility: The project has been refined to include accessibility features like ARIA labels, proper text formatting, and consistent iconography to ensure a professional, high-quality user experience.

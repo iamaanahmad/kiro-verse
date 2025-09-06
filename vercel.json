@@ -1,0 +1,26 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "functions": {
+    "src/app/actions.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_FIREBASE_API_KEY": "@next_public_firebase_api_key",
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "@next_public_firebase_auth_domain",
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "@next_public_firebase_project_id",
+    "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": "@next_public_firebase_storage_bucket",
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "@next_public_firebase_messaging_sender_id",
+    "NEXT_PUBLIC_FIREBASE_APP_ID": "@next_public_firebase_app_id",
+    "FIREBASE_ADMIN_PROJECT_ID": "@firebase_admin_project_id",
+    "FIREBASE_ADMIN_CLIENT_EMAIL": "@firebase_admin_client_email",
+    "FIREBASE_ADMIN_PRIVATE_KEY": "@firebase_admin_private_key",
+    "GOOGLE_GENAI_API_KEY": "@google_genai_api_key",
+    "SEPOLIA_RPC_URL": "@sepolia_rpc_url",
+    "SERVER_WALLET_PRIVATE_KEY": "@server_wallet_private_key",
+    "NFT_CONTRACT_ADDRESS": "@nft_contract_address"
+  }
+}

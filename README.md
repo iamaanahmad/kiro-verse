@@ -52,8 +52,12 @@ const feedback = await getCodeFeedback(`
 When you demonstrate a programming skill, KiroVerse automatically:
 1. **Analyzes** your code with AI to identify the skill
 2. **Generates** a unique badge icon using multimodal AI
-3. **Mints** a real NFT on Sepolia testnet
+3. **Mints** a badge (demo mode: instant mock / production mode: real NFT on Sepolia)
 4. **Provides** an Etherscan link for verification
+
+**Demo Mode Toggle**: 
+- ⚡ **Demo Mode**: Instant badge creation with mock transactions (perfect for demonstrations)
+- 🔗 **Production Mode**: Real NFT minting on Sepolia testnet (verifiable blockchain credentials)
 
 **Example Badge Transaction**: [View on Etherscan](https://sepolia.etherscan.io/tx/0x123...)
 
@@ -181,12 +185,21 @@ NFT_CONTRACT_ADDRESS=0x1234...
 ## 🎬 Demo Flow
 
 1. **🔐 Sign In** - Anonymous Firebase authentication
-2. **💻 Submit Code** - Paste your JavaScript/TypeScript code
-3. **🤖 Get AI Feedback** - Receive intelligent mentorship from Kiro
-4. **💬 Ask Questions** - Chat with AI about your code
-5. **🏅 Earn Badges** - Demonstrate skills to mint NFT credentials
-6. **🔍 Verify on Blockchain** - Check your badges on Etherscan
-7. **📋 See Behind the Scenes** - Learn how Kiro built the features
+2. **⚙️ Choose Mode** - Toggle between Demo (instant) or Production (real blockchain)
+3. **💻 Submit Code** - Paste your JavaScript/TypeScript code
+4. **🤖 Get AI Feedback** - Receive intelligent mentorship from Kiro
+5. **💬 Ask Questions** - Chat with AI about your code
+6. **🏅 Earn Badges** - Demonstrate skills to mint NFT credentials
+7. **🔍 Verify on Blockchain** - Check your badges on Etherscan (real or mock)
+8. **📋 See Behind the Scenes** - Learn how Kiro built the features
+
+### 🎯 Judge Demo Features
+
+**Demo Mode Toggle**: Judges can switch between:
+- **Demo Mode** ⚡ - Instant badge creation with mock blockchain transactions
+- **Production Mode** 🔗 - Real NFT minting on Sepolia testnet
+
+This allows judges to see both the working demo experience and the actual blockchain integration capabilities!
 
 ---
 
