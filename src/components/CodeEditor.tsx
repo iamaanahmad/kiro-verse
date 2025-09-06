@@ -193,16 +193,24 @@ export default function CodeEditor({ code, onCodeChange, onGetFeedback, aiFeedba
           />
         </div>
         {aiFeedback && (
-           <div className="mt-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold text-foreground">Kiro's AI Feedback</h3>
-            </div>
-            <ScrollArea className="h-48 rounded-lg border bg-gradient-to-br from-secondary/30 to-secondary/50 p-4">
-              <div className="prose prose-sm max-w-none">
-                <AIFeedbackRenderer content={aiFeedback} />
+           <div className="mt-6">
+            <div className="flex items-center gap-3 mb-4 p-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+              <div className="relative">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <div className="absolute -inset-1 bg-primary/20 rounded-full animate-pulse"></div>
               </div>
-            </ScrollArea>
+              <div>
+                <h3 className="font-bold text-lg text-foreground">Kiro's AI Feedback</h3>
+                <p className="text-sm text-muted-foreground">Personalized code analysis and recommendations</p>
+              </div>
+            </div>
+            <div className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-background via-secondary/20 to-background shadow-lg">
+              <ScrollArea className="h-80 p-6">
+                <div className="prose prose-sm max-w-none">
+                  <AIFeedbackRenderer content={aiFeedback} />
+                </div>
+              </ScrollArea>
+            </div>
            </div>
         )}
          {isLoading && !aiFeedback && (
