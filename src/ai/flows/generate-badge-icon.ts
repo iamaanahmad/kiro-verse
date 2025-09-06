@@ -40,7 +40,7 @@ const generateBadgeIconFlow = ai.defineFlow(
       },
     });
 
-    if (!media.url) {
+    if (!media || !media.url) {
       throw new Error('Failed to generate badge icon.');
     }
 
