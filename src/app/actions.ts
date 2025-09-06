@@ -17,11 +17,16 @@ const nftContractAbi = [
 
 export async function getCodeFeedbackAction(code: string): Promise<string> {
   try {
-    const result = await getCodeFeedbackFlow({ code });
+    console.log('Getting code feedback for code length:', code.length);
+    const result = await Promise.race([
+      getCodeFeedbackFlow({ code }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Feedback timeout')), 30000))
+    ]);
+    console.log('Code feedback generated successfully');
     return result.feedback;
   } catch (error) {
-    console.error(error);
-    return "Sorry, I couldn't process the feedback request. Please try again.";
+    console.error('Code feedback error:', error);
+    return "Sorry, I couldn't process the feedback request. The AI service might be temporarily unavailable. Please try again.";
   }
 }
 
@@ -30,11 +35,16 @@ export async function sendChatMessageAction(
   query: string
 ): Promise<string> {
   try {
-    const result = await sendChatMessageFlow({ code, query });
+    console.log('Processing chat message, query length:', query.length);
+    const result = await Promise.race([
+      sendChatMessageFlow({ code, query }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Chat timeout')), 30000))
+    ]);
+    console.log('Chat response generated successfully');
     return result.aiResponse;
   } catch (error) {
-    console.error(error);
-    return "Sorry, I'm having trouble responding right now. Please try again later.";
+    console.error('Chat error:', error);
+    return "Sorry, I'm having trouble responding right now. The AI service might be temporarily unavailable. Please try again later.";
   }
 }
 
