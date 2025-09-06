@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview An AI agent to award a skill badge based on code analysis.
+ * @fileOverview An AI agent to analyze code and determine if a skill badge should be awarded.
  *
- * - awardSkillBadge - A function that handles the badge awarding process.
+ * - awardSkillBadge - A function that analyzes code and determines badge eligibility.
  * - AwardSkillBadgeInput - The input type for the awardSkillBadge function.
  * - AwardSkillBadgeOutput - The return type for the awardSkillBadge function.
  */
@@ -12,14 +12,13 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const AwardSkillBadgeInputSchema = z.object({
-  code: z.string().describe('The code to be analyzed for skill badge awarding.'),
+  code: z.string().describe('The code to be analyzed for skill demonstration.'),
 });
 export type AwardSkillBadgeInput = z.infer<typeof AwardSkillBadgeInputSchema>;
 
 const AwardSkillBadgeOutputSchema = z.object({
-  badgeName: z.string().describe('The name of the skill badge, e.g., "Python Looping" or "JavaScript Promises".'),
-  badgeDescription: z.string().describe('A brief description of the achievement.'),
-  badgeIcon: z.string().describe('A relevant icon name from the lucide-react library, e.g., "Repeat" or "Code".'),
+  badgeName: z.string().describe('The name of the skill badge to award, e.g., "JavaScript Promises".'),
+  badgeDescription: z.string().describe('A description of the skill demonstrated in the code.'),
 });
 export type AwardSkillBadgeOutput = z.infer<typeof AwardSkillBadgeOutputSchema>;
 
@@ -31,17 +30,24 @@ const awardSkillBadgePrompt = ai.definePrompt({
   name: 'awardSkillBadgePrompt',
   input: { schema: AwardSkillBadgeInputSchema },
   output: { schema: AwardSkillBadgeOutputSchema },
-  prompt: `You are a senior software engineer acting as a code mentor. Analyze the provided code and identify a single, specific, non-trivial programming concept demonstrated within it. Your task is to award a skill badge for this concept.
+  prompt: `You are Kiro, an AI code mentor that awards skill badges for demonstrated programming abilities.
 
-  Guidelines:
-  1.  **Identify a Core Concept:** Look for concepts like asynchronous operations, advanced data structures, error handling, functional programming patterns, etc. Avoid overly simple concepts like "basic syntax" or "variable declaration."
-  2.  **Create a Badge Name:** The name should be concise and professional (e.g., "Python Async/Await", "JS Array Manipulation", "Go Concurrency").
-  3.  **Write a Description:** The description should clearly state what the user demonstrated.
-  4.  **Suggest an Icon:** Choose a relevant and existing icon name from the 'lucide-react' icon library. Examples: 'Repeat' for loops, 'GitMerge' for promises, 'ShieldCheck' for error handling, 'Code' for general use. Ensure the icon exists.
+Analyze the following code and determine what specific programming skill is being demonstrated. Look for:
+- Language-specific features (JavaScript, TypeScript, Python, etc.)
+- Framework usage (React, Next.js, Express, etc.)
+- Programming concepts (Async/Await, Error Handling, Design Patterns)
+- Best practices (Code Quality, Testing, Documentation)
 
-  Code to analyze:
-  {{code}}
-  `,
+Only award a badge if the code genuinely demonstrates the skill, not just mentions it.
+
+Code to analyze:
+{{code}}
+
+Respond with a specific skill name and description. Examples:
+- "JavaScript Promises" for code using Promise.then() or async/await
+- "React Hooks" for code using useState, useEffect, etc.
+- "Error Handling" for code with proper try/catch blocks
+- "TypeScript Interfaces" for code defining and using interfaces`,
 });
 
 const awardSkillBadgeFlow = ai.defineFlow(
