@@ -348,14 +348,22 @@ export async function awardSkillBadgeAction(userId: string, code: string, demoMo
 
         // 3. Create the badge with the details
         console.log('Creating badge with details:', { badgeName, badgeDescription, demoMode });
-        const mintResult = await mintSkillBadgeAction(userId, {
-            name: badgeName,
-            description: badgeDescription,
-            icon: iconDataUri,
-        }, demoMode);
+        
+        if (demoMode) {
+            // Use simple demo badge creation
+            const demoResult = await createDemoBadge(userId, badgeName, badgeDescription, iconDataUri);
+            return demoResult;
+        } else {
+            // Try real blockchain minting with fallback
+            const mintResult = await mintSkillBadgeAction(userId, {
+                name: badgeName,
+                description: badgeDescription,
+                icon: iconDataUri,
+            }, demoMode);
 
-        console.log('Badge creation result:', mintResult);
-        return mintResult;
+            console.log('Badge creation result:', mintResult);
+            return mintResult;
+        }
 
     } catch (error) {
         console.error('Error in awardSkillBadgeAction:', error);
