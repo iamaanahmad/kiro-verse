@@ -137,18 +137,15 @@ export async function mintSkillBadgeAction(
     }
 
     // 1. Set up blockchain provider and wallet with timeout
-    const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL, {
-      name: 'sepolia',
-      chainId: 11155111
-    });
+    const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
     
     // Test connection first with shorter timeout
     try {
-      await Promise.race([
+      const blockNumber = await Promise.race([
         provider.getBlockNumber(),
         new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout')), 5000))
       ]);
-      console.log('Blockchain connection successful');
+      console.log('Blockchain connection successful, current block:', blockNumber);
     } catch (connectionError) {
       console.error('RPC connection failed:', connectionError);
       throw new Error('Blockchain network is currently unavailable. Please try again later or switch to demo mode.');
@@ -173,10 +170,22 @@ export async function mintSkillBadgeAction(
     
     // 3. Mint the NFT on the Sepolia testnet with shorter timeout
     console.log('Sending transaction to blockchain...');
+    
+    // Get current gas price from network
+    let gasPrice;
+    try {
+      const feeData = await provider.getFeeData();
+      gasPrice = feeData.gasPrice;
+      console.log('Current gas price:', gasPrice?.toString());
+    } catch (gasError) {
+      console.log('Failed to get gas price, using default');
+      gasPrice = ethers.parseUnits('20', 'gwei');
+    }
+    
     const tx = await Promise.race([
       nftContract.mintBadge(wallet.address, tokenURI, {
         gasLimit: 300000,
-        gasPrice: ethers.parseUnits('20', 'gwei')
+        gasPrice: gasPrice
       }),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Transaction timeout')), 15000))
     ]);
