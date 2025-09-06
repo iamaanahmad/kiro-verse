@@ -145,7 +145,7 @@ workflow:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/kiroverse.git
+git clone https://github.com/iamaanahmad/kiro-verse.git
 cd kiroverse
 
 # Install dependencies
