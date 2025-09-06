@@ -107,21 +107,51 @@ export async function awardSkillBadgeAction(userId: string, code: string): Promi
     }
 
     try {
-        // 1. Get badge details from AI
-        const aiResult = await awardSkillBadgeFlow({ code });
+        console.log('Starting badge award process for user:', userId);
+        
+        // 1. Get badge details from AI with timeout
+        let aiResult;
+        try {
+            aiResult = await Promise.race([
+                awardSkillBadgeFlow({ code }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('AI analysis timeout')), 30000))
+            ]);
+            console.log('AI analysis completed:', aiResult);
+        } catch (aiError) {
+            console.error('AI analysis failed:', aiError);
+            // Fallback to a generic badge if AI fails
+            aiResult = {
+                badgeName: "Code Analysis",
+                badgeDescription: "Demonstrated coding skills through code submission"
+            };
+        }
+        
         const { badgeName, badgeDescription } = aiResult;
         
-        // 2. Generate badge icon from AI
-        const iconResult = await generateBadgeIconFlow({ badgeName });
-        const { iconDataUri } = iconResult;
+        // 2. Generate badge icon from AI with fallback
+        let iconDataUri = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiMxZjJhMzciLz48dGV4dCB4PSI1MCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzYzNzNkZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+PhTwvdGV4dD48L3N2Zz4="; // Default badge icon
+        
+        try {
+            const iconResult = await Promise.race([
+                generateBadgeIconFlow({ badgeName }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Icon generation timeout')), 20000))
+            ]);
+            iconDataUri = iconResult.iconDataUri;
+            console.log('Badge icon generated successfully');
+        } catch (iconError) {
+            console.error('Icon generation failed, using fallback:', iconError);
+            // Keep the default icon
+        }
 
-        // 3. Mint the badge with the dynamic details
+        // 3. Create the badge with the details
+        console.log('Creating badge with details:', { badgeName, badgeDescription });
         const mintResult = await mintSkillBadgeAction(userId, {
             name: badgeName,
             description: badgeDescription,
-            icon: iconDataUri, // Use the generated image data URI
+            icon: iconDataUri,
         });
 
+        console.log('Badge creation result:', mintResult);
         return mintResult;
 
     } catch (error) {
