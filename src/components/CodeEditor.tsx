@@ -35,46 +35,46 @@ const AIFeedbackRenderer = ({ content }: { content: string }) => {
     let icon, bgColor, borderColor, textColor;
     
     if (isPositive) {
-      icon = <CheckCircle2 className="h-4 w-4 text-green-600" />;
-      bgColor = "bg-green-50";
-      borderColor = "border-green-200";
-      textColor = "text-green-900";
+      icon = <CheckCircle2 className="h-5 w-5 text-green-600" />;
+      bgColor = "bg-gradient-to-r from-green-50 to-green-100/50";
+      borderColor = "border-green-300";
+      textColor = "text-green-800";
     } else if (isIssue) {
-      icon = <AlertTriangle className="h-4 w-4 text-amber-600" />;
-      bgColor = "bg-amber-50";
-      borderColor = "border-amber-200";
-      textColor = "text-amber-900";
+      icon = <AlertTriangle className="h-5 w-5 text-amber-600" />;
+      bgColor = "bg-gradient-to-r from-amber-50 to-amber-100/50";
+      borderColor = "border-amber-300";
+      textColor = "text-amber-800";
     } else if (isSuggestion) {
-      icon = <Lightbulb className="h-4 w-4 text-blue-600" />;
-      bgColor = "bg-blue-50";
-      borderColor = "border-blue-200";
-      textColor = "text-blue-900";
+      icon = <Lightbulb className="h-5 w-5 text-blue-600" />;
+      bgColor = "bg-gradient-to-r from-blue-50 to-blue-100/50";
+      borderColor = "border-blue-300";
+      textColor = "text-blue-800";
     } else if (isCodeBlock) {
-      icon = <Code2 className="h-4 w-4 text-purple-600" />;
-      bgColor = "bg-purple-50";
-      borderColor = "border-purple-200";
-      textColor = "text-purple-900";
+      icon = <Code2 className="h-5 w-5 text-purple-600" />;
+      bgColor = "bg-gradient-to-r from-purple-50 to-purple-100/50";
+      borderColor = "border-purple-300";
+      textColor = "text-purple-800";
     } else {
-      icon = <Info className="h-4 w-4 text-gray-600" />;
-      bgColor = "bg-gray-50";
-      borderColor = "border-gray-200";
-      textColor = "text-gray-900";
+      icon = <Info className="h-5 w-5 text-slate-600" />;
+      bgColor = "bg-gradient-to-r from-slate-50 to-slate-100/50";
+      borderColor = "border-slate-300";
+      textColor = "text-slate-800";
     }
     
     return (
-      <div key={index} className={`rounded-lg border p-4 mb-4 ${bgColor} ${borderColor}`}>
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 mt-0.5">
+      <div key={index} className={`rounded-xl border-2 p-6 mb-6 shadow-sm hover:shadow-md transition-all duration-200 ${bgColor} ${borderColor}`}>
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 mt-1 p-2 rounded-lg bg-white/50 border border-current/20">
             {icon}
           </div>
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-3">
             {lines.map((line, lineIndex) => {
               const trimmedLine = line.trim();
               
               // Handle code blocks
               if (trimmedLine.startsWith('```') || trimmedLine.includes('function') || trimmedLine.includes('const ')) {
                 return (
-                  <div key={lineIndex} className="bg-gray-900 text-gray-100 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                  <div key={lineIndex} className="bg-slate-900 text-slate-100 p-4 rounded-lg font-mono text-sm overflow-x-auto border border-slate-700 shadow-inner">
                     <code>{trimmedLine.replace(/```\w*/, '').replace(/```/, '')}</code>
                   </div>
                 );
@@ -83,9 +83,9 @@ const AIFeedbackRenderer = ({ content }: { content: string }) => {
               // Handle bullet points
               if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ')) {
                 return (
-                  <div key={lineIndex} className="flex items-start gap-2 ml-4">
-                    <div className="w-1.5 h-1.5 rounded-full bg-current mt-2 flex-shrink-0"></div>
-                    <span className={`text-sm leading-relaxed ${textColor}`}>
+                  <div key={lineIndex} className="flex items-start gap-3 ml-2">
+                    <div className="w-2 h-2 rounded-full bg-current mt-2.5 flex-shrink-0 shadow-sm"></div>
+                    <span className={`text-base leading-relaxed ${textColor} font-medium`}>
                       {renderInlineFormatting(trimmedLine.substring(2))}
                     </span>
                   </div>
@@ -95,7 +95,7 @@ const AIFeedbackRenderer = ({ content }: { content: string }) => {
               // Regular text
               if (trimmedLine) {
                 return (
-                  <p key={lineIndex} className={`text-sm leading-relaxed ${textColor} ${lineIndex === 0 ? 'font-medium' : ''}`}>
+                  <p key={lineIndex} className={`text-base leading-relaxed ${textColor} ${lineIndex === 0 ? 'font-bold text-lg' : 'font-medium'}`}>
                     {renderInlineFormatting(trimmedLine)}
                   </p>
                 );
@@ -115,7 +115,7 @@ const AIFeedbackRenderer = ({ content }: { content: string }) => {
     return parts.map((part, index) => {
       if (part.startsWith('`') && part.endsWith('`')) {
         return (
-          <code key={index} className="bg-gray-200 text-gray-800 px-1.5 py-0.5 rounded text-xs font-mono">
+          <code key={index} className="bg-slate-200 text-slate-800 px-2 py-1 rounded-md text-sm font-mono border border-slate-300">
             {part.slice(1, -1)}
           </code>
         );
@@ -128,13 +128,15 @@ const AIFeedbackRenderer = ({ content }: { content: string }) => {
   };
   
   return (
-    <div className="space-y-1">
+    <div className="space-y-4">
       {sections.length > 0 ? (
         sections.map(renderSection)
       ) : (
-        <div className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <Info className="h-4 w-4 text-gray-600" />
-          <p className="text-sm text-gray-700">No feedback available.</p>
+        <div className="flex items-center gap-4 p-6 bg-gradient-to-r from-slate-50 to-slate-100/50 border-2 border-slate-300 rounded-xl shadow-sm">
+          <div className="p-2 rounded-lg bg-white/50 border border-slate-400/20">
+            <Info className="h-5 w-5 text-slate-600" />
+          </div>
+          <p className="text-base text-slate-700 font-medium">No feedback available yet. Click the button above to get AI analysis!</p>
         </div>
       )}
     </div>
