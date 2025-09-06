@@ -166,17 +166,17 @@ export default function KiroSpecDisplay({ title, spec, trigger }: KiroSpecDispla
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] animate-scale-in">
-        <DialogHeader className="pb-4">
-          <div className="flex items-center gap-3 animate-fade-in">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 animate-pulse-glow">
-              <Sparkles className="h-6 w-6 text-primary" />
+      <DialogContent className="sm:max-w-6xl max-h-[95vh] animate-scale-in">
+        <DialogHeader className="pb-6">
+          <div className="flex items-center gap-4 animate-fade-in">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 animate-pulse-glow">
+              <Sparkles className="h-8 w-8 text-primary" />
             </div>
             <div className="flex-1">
-              <DialogTitle className="text-xl font-semibold gradient-text">
+              <DialogTitle className="text-2xl font-bold gradient-text mb-2">
                 Behind the Scenes: {title}
               </DialogTitle>
-              <DialogDescription className="text-base mt-1 text-muted-foreground">
+              <DialogDescription className="text-lg text-muted-foreground">
                 Discover how Kiro's spec-driven development process brings this feature to life
               </DialogDescription>
             </div>
@@ -185,38 +185,40 @@ export default function KiroSpecDisplay({ title, spec, trigger }: KiroSpecDispla
         
         <div className="flex-1 overflow-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsList className="grid w-full grid-cols-3 mb-6 h-auto p-2 bg-muted/50">
               {tabData.map((tab) => (
                 <TabsTrigger 
                   key={tab.value} 
                   value={tab.value}
-                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  className="flex flex-col items-center gap-2 p-4 h-auto data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all duration-200"
                 >
-                  <TabIcon type={tab.value as any} isActive={activeTab === tab.value} />
-                  <div className="text-left">
-                    <div className="font-medium">{tab.label}</div>
-                    <div className="text-xs opacity-70 hidden sm:block">{tab.description}</div>
+                  <div className="flex items-center gap-2">
+                    <TabIcon type={tab.value as any} isActive={activeTab === tab.value} />
+                    <div className="font-semibold text-base">{tab.label}</div>
+                  </div>
+                  <div className="text-xs opacity-80 text-center leading-tight">
+                    {tab.description}
                   </div>
                 </TabsTrigger>
               ))}
             </TabsList>
             
             <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-[500px] pr-4 custom-scrollbar">
+              <ScrollArea className="h-[600px] pr-4 custom-scrollbar">
                 {tabData.map((tab) => (
                   <TabsContent key={tab.value} value={tab.value} className="mt-0 animate-fade-in">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-4 animate-slide-in-right">
-                        <Badge variant="secondary" className="text-xs bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-                          Kiro Spec-Driven Development
+                    <div className="space-y-6">
+                      <div className="flex flex-wrap items-center gap-3 mb-6 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl border border-primary/20 animate-slide-in-right">
+                        <Badge variant="secondary" className="text-sm px-3 py-1 bg-gradient-to-r from-primary/15 to-primary/10 border-primary/30 font-medium">
+                          🚀 Kiro Spec-Driven Development
                         </Badge>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground animate-pulse" />
-                        <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-                          {tab.label} Phase
+                        <ArrowRight className="h-5 w-5 text-muted-foreground animate-pulse" />
+                        <Badge variant="outline" className="text-sm px-3 py-1 border-primary/40 text-primary font-medium">
+                          📋 {tab.label} Phase
                         </Badge>
                       </div>
                       
-                      <div className="bg-gradient-to-br from-muted/40 to-muted/20 rounded-xl p-6 border border-border/50 shadow-sm hover-lift transition-all duration-300">
+                      <div className="bg-gradient-to-br from-background via-muted/10 to-background rounded-2xl p-8 border-2 border-border/30 shadow-lg hover-lift transition-all duration-300">
                         <MarkdownContent content={tab.content} type={tab.value as any} />
                       </div>
                     </div>
