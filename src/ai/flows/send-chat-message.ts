@@ -1,24 +1,24 @@
 'use server';
 
 /**
- * @fileOverview An AI agent to send chat messages to Kiro (simulated via Gemini) and receive helpful answers about code.
+ * @fileOverview An AI agent to handle conversational chat with code context.
  *
- * - sendChatMessage - A function that handles sending chat messages and receiving responses.
+ * - sendChatMessage - A function that handles chat interactions with code context.
  * - SendChatMessageInput - The input type for the sendChatMessage function.
  * - SendChatMessageOutput - The return type for the sendChatMessage function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const SendChatMessageInputSchema = z.object({
-  code: z.string().describe('The code content to analyze.'),
-  query: z.string().describe('The user query or message about the code.'),
+  code: z.string().describe('The code context for the conversation.'),
+  query: z.string().describe('The user\'s question or message.'),
 });
 export type SendChatMessageInput = z.infer<typeof SendChatMessageInputSchema>;
 
 const SendChatMessageOutputSchema = z.object({
-  aiResponse: z.string().describe('The AI response to the user query.'),
+  aiResponse: z.string().describe('The AI mentor\'s response to the user\'s query.'),
 });
 export type SendChatMessageOutput = z.infer<typeof SendChatMessageOutputSchema>;
 
@@ -26,17 +26,27 @@ export async function sendChatMessage(input: SendChatMessageInput): Promise<Send
   return sendChatMessageFlow(input);
 }
 
-const prompt = ai.definePrompt({
+const sendChatMessagePrompt = ai.definePrompt({
   name: 'sendChatMessagePrompt',
-  input: {schema: SendChatMessageInputSchema},
-  output: {schema: SendChatMessageOutputSchema},
-  prompt: `You are Kiro, an AI code mentor. A user has provided the following code and asked a question. Use the code to provide a helpful answer to the question. Only respond to the question, do not write any extra text.
+  input: { schema: SendChatMessageInputSchema },
+  output: { schema: SendChatMessageOutputSchema },
+  prompt: `You are Kiro, an AI code mentor who uses the Socratic method to guide learning. You help developers understand their code through thoughtful questions and explanations.
 
-Code:
+Guidelines:
+- Use a conversational, encouraging tone
+- Ask guiding questions to help the user discover answers
+- Provide explanations that build understanding
+- Reference the provided code context when relevant
+- Focus on teaching principles, not just giving direct answers
+- Encourage best practices and clean code
+
+Code Context:
 {{code}}
 
-Question:
-{{query}}`,
+User's Question:
+{{query}}
+
+Respond as Kiro, the helpful AI mentor:`,
 });
 
 const sendChatMessageFlow = ai.defineFlow(
@@ -46,7 +56,7 @@ const sendChatMessageFlow = ai.defineFlow(
     outputSchema: SendChatMessageOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const { output } = await sendChatMessagePrompt(input);
     return output!;
   }
 );
