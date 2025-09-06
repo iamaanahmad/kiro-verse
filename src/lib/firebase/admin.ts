@@ -13,7 +13,7 @@ if (!getApps().length) {
         credential: admin.credential.cert({
           projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
           clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY!.replace(/\\n/g, '\n'),
         }),
       });
     } catch (error) {
@@ -24,7 +24,7 @@ if (!getApps().length) {
   }
 }
 
-let adminDb, adminAuth;
+let adminDb: any, adminAuth: any;
 
 if (getApps().length > 0) {
   adminDb = admin.firestore();
