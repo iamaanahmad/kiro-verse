@@ -1,6 +1,21 @@
 # 🏆 KiroVerse - AI-Powered Code Dojo with Blockchain Credentials
 
-> **Winner of the "Code with Kiro" Hackathon** - Where AI mentorship meets verifiable blockchain achievements
+> **"Code with Kiro" Hackathon Submission** - Where AI mentorship meets verifiable blockchain achievements
+
+## 🎬 **Live Demo & Video**
+
+### 📹 **3-Minute Demo Video** 
+**[🎥 Watch KiroVerse in Action](https://youtube.com/watch?v=your-demo-video)** *(Required for judges)*
+
+### 🌐 **Try It NOW - Live Demo**
+**🚀 [Launch KiroVerse](https://kiroverse.vercel.app)** - *No signup required!*
+
+**For Judges**: Toggle between Demo Mode (instant) and Production Mode (real blockchain) to see both capabilities!
+
+### 🏅 **Hackathon Details**
+- **Category**: Educational Apps (Primary) + Productivity & Workflow Tools
+- **Kiro Integration**: Deep spec-driven development with agent hooks and Genkit flows
+- **Innovation**: First platform combining AI mentorship with blockchain credentials
 
 [![Built with Kiro](https://img.shields.io/badge/Built%20with-Kiro-blue?style=for-the-badge)](https://kiro.ai)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
