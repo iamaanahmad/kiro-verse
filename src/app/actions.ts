@@ -142,11 +142,21 @@ export async function mintSkillBadgeAction(
         date: new Date().toISOString(),
       };
 
-      // Save to Firestore
-      const userRef = adminDb.collection('users').doc(userId);
-      await userRef.set({
-          badges: FieldValue.arrayUnion(newBadge)
-      }, { merge: true });
+      // Save to database
+      try {
+        if (adminDb && typeof adminDb.collection === 'function') {
+          const userRef = adminDb.collection('users').doc(userId);
+          await userRef.set({
+              badges: FieldValue.arrayUnion(newBadge)
+          }, { merge: true });
+        } else {
+          console.log('Using mock database for demo badge');
+          mockDb.addBadge(userId, newBadge);
+        }
+      } catch (error) {
+        console.error('Error saving demo badge to Firebase, using mock database:', error);
+        mockDb.addBadge(userId, newBadge);
+      }
 
       console.log(`Mock badge created successfully: ${newBadge.name} with tx: ${mockTxHash}`);
       return { success: true, txHash: mockTxHash, badge: newBadge };
@@ -155,28 +165,70 @@ export async function mintSkillBadgeAction(
     // Production Mode: Real blockchain minting
     console.log('Production mode: Attempting real blockchain minting');
     
-    if (!process.env.SEPOLIA_RPC_URL || !process.env.SERVER_WALLET_PRIVATE_KEY || !process.env.NFT_CONTRACT_ADDRESS) {
-      console.error("Missing required environment variables for blockchain minting.");
-      return { success: false, error: "Blockchain configuration missing. Please set up environment variables for real minting." };
+    // Validate environment variables
+    const rpcUrl = process.env.SEPOLIA_RPC_URL;
+    const privateKey = process.env.SERVER_WALLET_PRIVATE_KEY;
+    const contractAddress = process.env.NFT_CONTRACT_ADDRESS;
+    
+    if (!rpcUrl || !privateKey || !contractAddress) {
+      console.error("Missing required environment variables for blockchain minting:", {
+        hasRpcUrl: !!rpcUrl,
+        hasPrivateKey: !!privateKey,
+        hasContractAddress: !!contractAddress
+      });
+      return { success: false, error: "Blockchain configuration is incomplete. Please contact support or use demo mode." };
+    }
+    
+    // Validate private key format
+    if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
+      console.error("Invalid private key format");
+      return { success: false, error: "Blockchain wallet configuration is invalid. Please contact support or use demo mode." };
+    }
+    
+    // Validate contract address format
+    if (!contractAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+      console.error("Invalid contract address format");
+      return { success: false, error: "Smart contract address is invalid. Please contact support or use demo mode." };
     }
 
     // 1. Set up blockchain provider and wallet with timeout
-    const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
     
     // Test connection first with shorter timeout
     try {
       const blockNumber = await Promise.race([
         provider.getBlockNumber(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout')), 5000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('RPC connection timeout')), 8000))
       ]);
       console.log('Blockchain connection successful, current block:', blockNumber);
     } catch (connectionError) {
       console.error('RPC connection failed:', connectionError);
-      throw new Error('Blockchain network is currently unavailable. Please try again later or switch to demo mode.');
+      if (connectionError instanceof Error && connectionError.message.includes('timeout')) {
+        throw new Error('Blockchain network connection timed out. Please try again or switch to demo mode.');
+      }
+      throw new Error('Blockchain network is currently unavailable. Please check your connection and try again, or switch to demo mode.');
     }
 
-    const wallet = new ethers.Wallet(process.env.SERVER_WALLET_PRIVATE_KEY, provider);
-    const nftContract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, nftContractAbi, wallet);
+    const wallet = new ethers.Wallet(privateKey, provider);
+    const nftContract = new ethers.Contract(contractAddress, nftContractAbi, wallet);
+    
+    // Check wallet balance
+    try {
+      const balance = await wallet.provider.getBalance(wallet.address);
+      console.log('Wallet address:', wallet.address);
+      console.log('Wallet balance:', ethers.formatEther(balance), 'ETH');
+      
+      if (balance < ethers.parseEther('0.001')) {
+        console.warn('Low wallet balance:', ethers.formatEther(balance), 'ETH');
+        return { 
+          success: false, 
+          error: `Insufficient funds in minting wallet (${ethers.formatEther(balance)} ETH). Please fund the wallet at ${wallet.address} or use demo mode.` 
+        };
+      }
+    } catch (balanceError) {
+      console.error('Failed to check wallet balance:', balanceError);
+      // Continue anyway, let the transaction fail if needed
+    }
 
     // 2. Create metadata for the NFT
     const tokenMetadata = {
@@ -198,11 +250,20 @@ export async function mintSkillBadgeAction(
     // Get current gas price from network
     let gasPrice;
     try {
-      const feeData = await provider.getFeeData();
+      const feeData = await Promise.race([
+        provider.getFeeData(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Gas price timeout')), 5000))
+      ]);
       gasPrice = feeData.gasPrice;
       console.log('Current gas price:', gasPrice?.toString());
+      
+      // Fallback if gas price is null or too low
+      if (!gasPrice || gasPrice < ethers.parseUnits('1', 'gwei')) {
+        console.log('Gas price too low or null, using default');
+        gasPrice = ethers.parseUnits('20', 'gwei');
+      }
     } catch (gasError) {
-      console.log('Failed to get gas price, using default');
+      console.log('Failed to get gas price, using default:', gasError);
       gasPrice = ethers.parseUnits('20', 'gwei');
     }
     
@@ -229,8 +290,7 @@ export async function mintSkillBadgeAction(
     
     const realTxHash = receipt.hash;
 
-    // 5. Save the badge details to Firestore with the real transaction hash
-    const userRef = adminDb.collection('users').doc(userId);
+    // 5. Save the badge details to database with the real transaction hash
     const newBadge: Badge = {
       id: `${badgeDetails.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
       name: badgeDetails.name,
@@ -240,9 +300,20 @@ export async function mintSkillBadgeAction(
       date: new Date().toISOString(),
     };
 
-    await userRef.set({
-        badges: FieldValue.arrayUnion(newBadge)
-    }, { merge: true });
+    try {
+      if (adminDb && typeof adminDb.collection === 'function') {
+        const userRef = adminDb.collection('users').doc(userId);
+        await userRef.set({
+            badges: FieldValue.arrayUnion(newBadge)
+        }, { merge: true });
+      } else {
+        console.log('Using mock database for production badge');
+        mockDb.addBadge(userId, newBadge);
+      }
+    } catch (error) {
+      console.error('Error saving production badge to Firebase, using mock database:', error);
+      mockDb.addBadge(userId, newBadge);
+    }
 
     console.log(`Real blockchain badge minted successfully: ${newBadge.name} with tx: ${realTxHash}`);
     return { success: true, txHash: realTxHash, badge: newBadge };
