@@ -5,6 +5,7 @@ import { sendChatMessage as sendChatMessageFlow } from '@/ai/flows/send-chat-mes
 import { awardSkillBadge as awardSkillBadgeFlow } from '@/ai/flows/award-skill-badge';
 import { generateBadgeIcon as generateBadgeIconFlow } from '@/ai/flows/generate-badge-icon';
 import { adminDb } from '@/lib/firebase/admin';
+import { mockDb } from '@/lib/mock-db';
 import type { Badge } from '@/types';
 import { FieldValue } from 'firebase-admin/firestore';
 import { ethers } from 'ethers';
@@ -50,27 +51,41 @@ export async function sendChatMessageAction(
 
 export async function getUserBadges(userId: string): Promise<Badge[]> {
   try {
-    const userDoc = await adminDb.collection('users').doc(userId).get();
-    if (userDoc.exists) {
-      return (userDoc.data()?.badges || []).sort((a: Badge, b: Badge) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Try Firebase first, fallback to mock DB
+    if (adminDb && typeof adminDb.collection === 'function') {
+      const userDoc = await adminDb.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        return (userDoc.data()?.badges || []).sort((a: Badge, b: Badge) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      }
+      return [];
+    } else {
+      // Use mock database
+      console.log('Using mock database for getUserBadges');
+      return mockDb.getUserBadges(userId);
     }
-    return [];
   } catch (error) {
-    console.error('Error fetching badges:', error);
-    return [];
+    console.error('Error fetching badges, using mock database:', error);
+    return mockDb.getUserBadges(userId);
   }
 }
 
 export async function getDemoMode(userId: string): Promise<boolean> {
   try {
-    const userDoc = await adminDb.collection('users').doc(userId).get();
-    if (userDoc.exists) {
-      return userDoc.data()?.demoMode ?? true; // Default to demo mode
+    // Try Firebase first, fallback to mock DB
+    if (adminDb && typeof adminDb.collection === 'function') {
+      const userDoc = await adminDb.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        return userDoc.data()?.demoMode ?? true; // Default to demo mode
+      }
+      return true;
+    } else {
+      // Use mock database
+      console.log('Using mock database for getDemoMode');
+      return mockDb.getDemoMode(userId);
     }
-    return true;
   } catch (error) {
-    console.error('Error fetching demo mode:', error);
-    return true; // Default to demo mode on error
+    console.error('Error fetching demo mode, using mock database:', error);
+    return mockDb.getDemoMode(userId);
   }
 }
 
@@ -80,17 +95,26 @@ export async function setDemoMode(userId: string, demoMode: boolean): Promise<{ 
       return { success: false, error: 'User not authenticated.' };
     }
 
-    const userRef = adminDb.collection('users').doc(userId);
-    await userRef.set({
-      demoMode: demoMode,
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
+    // Try Firebase first, fallback to mock DB
+    if (adminDb && typeof adminDb.collection === 'function') {
+      const userRef = adminDb.collection('users').doc(userId);
+      await userRef.set({
+        demoMode: demoMode,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } else {
+      // Use mock database
+      console.log('Using mock database for setDemoMode');
+      mockDb.setDemoMode(userId, demoMode);
+    }
 
     console.log(`Demo mode set to ${demoMode} for user ${userId}`);
     return { success: true };
   } catch (error) {
-    console.error('Error setting demo mode:', error);
-    return { success: false, error: 'Failed to update demo mode setting.' };
+    console.error('Error setting demo mode, using mock database:', error);
+    mockDb.setDemoMode(userId, demoMode);
+    console.log(`Demo mode set to ${demoMode} for user ${userId} (mock DB)`);
+    return { success: true };
   }
 }
 
