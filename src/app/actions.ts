@@ -419,30 +419,61 @@ async function createDemoBadge(userId: string, badgeName: string, badgeDescripti
 // Test blockchain configuration
 export async function testBlockchainConfig(): Promise<{ success: boolean; error?: string; details?: any }> {
   try {
+    console.log('Testing blockchain configuration...');
+    
     const rpcUrl = process.env.SEPOLIA_RPC_URL;
     const privateKey = process.env.SERVER_WALLET_PRIVATE_KEY;
     const contractAddress = process.env.NFT_CONTRACT_ADDRESS;
+    
+    console.log('Environment variables check:', {
+      hasRpcUrl: !!rpcUrl,
+      hasPrivateKey: !!privateKey,
+      hasContractAddress: !!contractAddress,
+      rpcUrl: rpcUrl
+    });
     
     if (!rpcUrl || !privateKey || !contractAddress) {
       return { success: false, error: "Missing environment variables" };
     }
     
+    console.log('Creating provider...');
     const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const blockNumber = await provider.getBlockNumber();
+    
+    console.log('Getting block number...');
+    const blockNumber = await Promise.race([
+      provider.getBlockNumber(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Test timeout')), 10000))
+    ]);
+    
+    console.log('Creating wallet...');
     const wallet = new ethers.Wallet(privateKey, provider);
+    
+    console.log('Getting balance...');
     const balance = await provider.getBalance(wallet.address);
     
-    return { 
+    const result = { 
       success: true, 
       details: {
         blockNumber,
         walletAddress: wallet.address,
         balance: ethers.formatEther(balance),
-        contractAddress
+        contractAddress,
+        rpcUrl
       }
     };
+    
+    console.log('Test successful:', result);
+    return result;
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    console.error('Test failed:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error",
+      details: {
+        errorType: typeof error,
+        errorName: error instanceof Error ? error.name : 'Unknown'
+      }
+    };
   }
 }
 
