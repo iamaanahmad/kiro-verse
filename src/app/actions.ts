@@ -321,52 +321,22 @@ export async function mintSkillBadgeAction(
   } catch (error) {
     console.error('Error minting badge:', error);
     let errorMessage = "An unknown error occurred during minting.";
-    let shouldFallback = false;
     
     if (error instanceof Error) {
       if (error.message.includes('timeout')) {
-        errorMessage = "Blockchain network is slow. Automatically switching to demo mode for this badge.";
-        shouldFallback = true;
+        errorMessage = "Blockchain network is slow. Transaction timed out. Please try again or switch to demo mode.";
       } else if (error.message.includes('could not coalesce error') || error.message.includes('coalesce')) {
-        errorMessage = "Blockchain network error. Automatically switching to demo mode for this badge.";
-        shouldFallback = true;
+        errorMessage = "Blockchain network error. Please try again or switch to demo mode.";
       } else if (error.message.includes('insufficient funds')) {
         errorMessage = "Insufficient funds for gas fees. Please contact support or use demo mode.";
       } else if (error.message.includes('nonce')) {
         errorMessage = "Transaction nonce error. Please try again in a moment.";
       } else if (error.message.includes('network') || error.message.includes('connection')) {
-        errorMessage = "Network connection issue. Automatically switching to demo mode for this badge.";
-        shouldFallback = true;
+        errorMessage = "Network connection issue. Please check your connection and try again, or switch to demo mode.";
+      } else if (error.message.includes('unavailable')) {
+        errorMessage = error.message; // Keep the original message about network being unavailable
       } else {
-        errorMessage = error.message;
-        // For any unknown error, try fallback
-        shouldFallback = true;
-      }
-    }
-    
-    // Auto-fallback to demo mode for certain errors
-    if (shouldFallback) {
-      console.log('Auto-fallback: Creating demo badge due to blockchain error');
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-      const fallbackBadge: Badge = {
-        id: `${badgeDetails.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
-        name: badgeDetails.name,
-        description: badgeDetails.description,
-        icon: badgeDetails.icon,
-        txHash: mockTxHash,
-        date: new Date().toISOString(),
-      };
-
-      try {
-        const userRef = adminDb.collection('users').doc(userId);
-        await userRef.set({
-            badges: FieldValue.arrayUnion(fallbackBadge)
-        }, { merge: true });
-        
-        return { success: true, txHash: mockTxHash, badge: fallbackBadge };
-      } catch (dbError) {
-        console.error('Fallback demo badge creation failed:', dbError);
-        return { success: false, error: 'Failed to create fallback badge. Please try demo mode.' };
+        errorMessage = `Blockchain error: ${error.message}. Please try again or switch to demo mode.`;
       }
     }
     
@@ -387,13 +357,55 @@ async function createDemoBadge(userId: string, badgeName: string, badgeDescripti
     date: new Date().toISOString(),
   };
 
-  const userRef = adminDb.collection('users').doc(userId);
-  await userRef.set({
-      badges: FieldValue.arrayUnion(newBadge)
-  }, { merge: true });
+  try {
+    // Try Firebase first, fallback to mock DB
+    if (adminDb && typeof adminDb.collection === 'function') {
+      const userRef = adminDb.collection('users').doc(userId);
+      await userRef.set({
+          badges: FieldValue.arrayUnion(newBadge)
+      }, { merge: true });
+    } else {
+      // Use mock database
+      console.log('Using mock database for createDemoBadge');
+      mockDb.addBadge(userId, newBadge);
+    }
+  } catch (error) {
+    console.error('Error saving demo badge to Firebase, using mock database:', error);
+    mockDb.addBadge(userId, newBadge);
+  }
 
   console.log(`Demo badge created successfully: ${newBadge.name} with tx: ${mockTxHash}`);
   return { success: true, txHash: mockTxHash, badge: newBadge };
+}
+
+// Test blockchain configuration
+export async function testBlockchainConfig(): Promise<{ success: boolean; error?: string; details?: any }> {
+  try {
+    const rpcUrl = process.env.SEPOLIA_RPC_URL;
+    const privateKey = process.env.SERVER_WALLET_PRIVATE_KEY;
+    const contractAddress = process.env.NFT_CONTRACT_ADDRESS;
+    
+    if (!rpcUrl || !privateKey || !contractAddress) {
+      return { success: false, error: "Missing environment variables" };
+    }
+    
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
+    const blockNumber = await provider.getBlockNumber();
+    const wallet = new ethers.Wallet(privateKey, provider);
+    const balance = await provider.getBalance(wallet.address);
+    
+    return { 
+      success: true, 
+      details: {
+        blockNumber,
+        walletAddress: wallet.address,
+        balance: ethers.formatEther(balance),
+        contractAddress
+      }
+    };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+  }
 }
 
 export async function awardSkillBadgeAction(userId: string, code: string, demoMode: boolean = true): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
@@ -443,6 +455,7 @@ export async function awardSkillBadgeAction(userId: string, code: string, demoMo
 
         // 3. Create the badge with the details
         console.log('Creating badge with details:', { badgeName, badgeDescription, demoMode });
+        console.log('Demo mode check - demoMode parameter:', demoMode, typeof demoMode);
         
         if (demoMode) {
             // Use simple demo badge creation
