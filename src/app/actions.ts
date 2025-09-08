@@ -266,7 +266,7 @@ export async function mintSkillBadgeAction(
     
     // Test contract connection and get basic info
     try {
-      console.log('Testing contract connection...');
+      console.log('Testing KiroVerse contract connection...');
       const contractName = await Promise.race([
         nftContract.name(),
         new Promise((_, reject) => setTimeout(() => reject(new Error('Contract name timeout')), 5000))
@@ -276,16 +276,35 @@ export async function mintSkillBadgeAction(
       const contractSymbol = await nftContract.symbol();
       console.log('Contract symbol:', contractSymbol);
       
-      const totalSupply = await nftContract.totalSupply();
-      console.log('Total supply:', totalSupply.toString());
+      // Test totalSupply - our new contract should have this function
+      try {
+        const totalSupply = await nftContract.totalSupply();
+        console.log('Total supply:', totalSupply.toString());
+      } catch (supplyError) {
+        console.log('Note: totalSupply not available on this contract (older version?)');
+      }
+      
+      console.log('KiroVerse contract validation successful');
     } catch (contractError) {
       console.error('Contract validation failed:', contractError);
-      throw new Error('Smart contract is not responding or invalid. Please contact support or use demo mode.');
+      
+      // More specific error messages based on the type of error
+      if (contractError instanceof Error) {
+        if (contractError.message.includes('CALL_EXCEPTION') || contractError.message.includes('missing revert data')) {
+          throw new Error('Smart contract does not support the required functions. Please deploy the new KiroVerse badges contract or use demo mode.');
+        } else if (contractError.message.includes('timeout')) {
+          throw new Error('Smart contract is slow to respond. Please try again or use demo mode.');
+        } else if (contractError.message.includes('network')) {
+          throw new Error('Network error when connecting to smart contract. Please try again or use demo mode.');
+        }
+      }
+      
+      throw new Error('Smart contract is not responding or invalid. Please deploy the new KiroVerse badges contract or use demo mode.');
     }
     
     // Check wallet balance
     try {
-      const balance = await wallet.provider.getBalance(wallet.address);
+      const balance = await provider.getBalance(wallet.address);
       console.log('Wallet address:', wallet.address);
       console.log('Wallet balance:', ethers.formatEther(balance), 'ETH');
       
