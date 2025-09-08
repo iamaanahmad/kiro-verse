@@ -41,9 +41,14 @@ const mockDb = {
 };
 import { ethers } from 'ethers';
 
-// A simple ABI for our NFT contract's mint function
+// Standard ERC-721 ABI with common mint functions
 const nftContractAbi = [
-  "function mintBadge(address to, string memory tokenURI) public returns (uint256)"
+  "function mint(address to, string memory tokenURI) public returns (uint256)",
+  "function mintBadge(address to, string memory tokenURI) public returns (uint256)",
+  "function safeMint(address to, string memory tokenURI) public returns (uint256)",
+  "function totalSupply() public view returns (uint256)",
+  "function name() public view returns (string)",
+  "function symbol() public view returns (string)"
 ];
 
 
@@ -256,6 +261,25 @@ export async function mintSkillBadgeAction(
 
     const wallet = new ethers.Wallet(privateKey, provider);
     const nftContract = new ethers.Contract(contractAddress, nftContractAbi, wallet);
+    
+    // Test contract connection and get basic info
+    try {
+      console.log('Testing contract connection...');
+      const contractName = await Promise.race([
+        nftContract.name(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Contract name timeout')), 5000))
+      ]);
+      console.log('Contract name:', contractName);
+      
+      const contractSymbol = await nftContract.symbol();
+      console.log('Contract symbol:', contractSymbol);
+      
+      const totalSupply = await nftContract.totalSupply();
+      console.log('Total supply:', totalSupply.toString());
+    } catch (contractError) {
+      console.error('Contract validation failed:', contractError);
+      throw new Error('Smart contract is not responding or invalid. Please contact support or use demo mode.');
+    }
     
     // Check wallet balance
     try {
