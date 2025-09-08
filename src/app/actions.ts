@@ -227,6 +227,7 @@ export async function mintSkillBadgeAction(
     
     // Test connection first with shorter timeout
     try {
+      console.log('Testing blockchain connection to:', rpcUrl);
       const blockNumber = await Promise.race([
         provider.getBlockNumber(),
         new Promise((_, reject) => setTimeout(() => reject(new Error('RPC connection timeout')), 8000))
@@ -234,9 +235,22 @@ export async function mintSkillBadgeAction(
       console.log('Blockchain connection successful, current block:', blockNumber);
     } catch (connectionError) {
       console.error('RPC connection failed:', connectionError);
-      if (connectionError instanceof Error && connectionError.message.includes('timeout')) {
-        throw new Error('Blockchain network connection timed out. Please try again or switch to demo mode.');
+      console.error('Connection error details:', {
+        message: connectionError instanceof Error ? connectionError.message : 'Unknown error',
+        rpcUrl: rpcUrl,
+        errorType: typeof connectionError
+      });
+      
+      if (connectionError instanceof Error) {
+        if (connectionError.message.includes('timeout')) {
+          throw new Error('Blockchain network connection timed out. Please try again or switch to demo mode.');
+        } else if (connectionError.message.includes('network') || connectionError.message.includes('fetch')) {
+          throw new Error('Network connection issue. Please check your internet connection and try again, or switch to demo mode.');
+        } else if (connectionError.message.includes('rate limit') || connectionError.message.includes('429')) {
+          throw new Error('RPC rate limit exceeded. Please try again in a moment or switch to demo mode.');
+        }
       }
+      
       throw new Error('Blockchain network is currently unavailable. Please check your connection and try again, or switch to demo mode.');
     }
 
