@@ -275,19 +275,12 @@ export async function mintSkillBadgeAction(
       // Continue anyway, let the transaction fail if needed
     }
 
-    // 2. Create metadata for the NFT
-    const tokenMetadata = {
-      name: badgeDetails.name,
-      description: badgeDetails.description,
-      image: badgeDetails.icon,
-      attributes: [
-        { "trait_type": "Skill", "value": "Programming" },
-        { "trait_type": "Awarded To", "value": userId },
-        { "trait_type": "Platform", "value": "KiroVerse" },
-        { "trait_type": "Minted At", "value": new Date().toISOString() }
-      ]
-    };
-    const tokenURI = `data:application/json;base64,${Buffer.from(JSON.stringify(tokenMetadata)).toString('base64')}`;
+    // 2. Create ultra-minimal tokenURI to avoid 413 Payload Too Large error
+    // Use the simplest possible tokenURI
+    const tokenURI = `KiroVerse-${badgeDetails.name.substring(0, 20).replace(/\s+/g, '-')}`;
+    
+    console.log('Ultra-minimal token URI:', tokenURI);
+    console.log('Token URI size:', tokenURI.length, 'characters');
     
     // 3. Mint the NFT on the Sepolia testnet with shorter timeout
     console.log('Sending transaction to blockchain...');
@@ -314,7 +307,7 @@ export async function mintSkillBadgeAction(
     
     const tx = await Promise.race([
       nftContract.mintBadge(wallet.address, tokenURI, {
-        gasLimit: 300000,
+        gasLimit: 150000, // Reduced gas limit
         gasPrice: gasPrice
       }),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Transaction timeout')), 15000))
