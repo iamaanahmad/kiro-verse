@@ -580,7 +580,7 @@ export async function testBlockchainConfig(): Promise<{ success: boolean; error?
   }
 }
 
-export async function awardSkillBadgeAction(userId: string, code: string, demoMode: boolean = true): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
+export async function awardSkillBadgeAction(userId: string, code: string, demoMode: boolean = true): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge; logs?: string[] }> {
     if (!userId) {
         return { success: false, error: 'User not authenticated.' };
     }
