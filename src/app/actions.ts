@@ -350,20 +350,71 @@ export async function mintSkillBadgeAction(
       gasPrice = ethers.parseUnits('20', 'gwei');
     }
     
-    // Create a simple blockchain transaction to prove the badge was minted
-    // Instead of complex NFT contract, we'll create a simple transaction with badge data
-    console.log('Creating blockchain transaction with badge data...');
+    // 3. Mint the NFT on the Sepolia testnet using the smart contract
+    console.log('Minting skill badge on KiroVerse contract...');
+    console.log('Token URI:', tokenURI);
+    console.log('Minting to wallet:', wallet.address);
+    console.log('Skill name:', badgeDetails.name);
     
-    const tx = await Promise.race([
-      wallet.sendTransaction({
-        to: wallet.address, // Send to self
-        value: ethers.parseEther('0.0001'), // Small amount to make it a real transaction
-        data: ethers.hexlify(ethers.toUtf8Bytes(tokenURI)), // Include badge data in transaction
-        gasLimit: 50000,
-        gasPrice: gasPrice
-      }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Transaction timeout')), 15000))
-    ]);
+    // Try the primary mintSkillBadge function first, then fallback to simpler functions
+    let tx;
+    
+    try {
+      console.log('Trying mintSkillBadge function...');
+      
+      tx = await Promise.race([
+        nftContract.mintSkillBadge(wallet.address, tokenURI, badgeDetails.name, {
+          gasLimit: 300000, // Higher gas limit for contract interaction
+          gasPrice: gasPrice
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Transaction timeout')), 20000))
+      ]);
+      
+      console.log('mintSkillBadge successful! Transaction hash:', tx.hash);
+      
+    } catch (mintError) {
+      console.error('mintSkillBadge failed, trying fallback methods:', mintError);
+      
+      // Try fallback mint functions
+      const mintFunctions = ['mint', 'safeMint'];
+      
+      for (const mintFunction of mintFunctions) {
+        try {
+          console.log(`Trying ${mintFunction} function...`);
+          
+          if (mintFunction === 'mint') {
+            tx = await Promise.race([
+              nftContract.mint(wallet.address, tokenURI, {
+                gasLimit: 250000,
+                gasPrice: gasPrice
+              }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Transaction timeout')), 15000))
+            ]);
+          } else if (mintFunction === 'safeMint') {
+            tx = await Promise.race([
+              nftContract.safeMint(wallet.address, tokenURI, {
+                gasLimit: 250000,
+                gasPrice: gasPrice
+              }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Transaction timeout')), 15000))
+            ]);
+          }
+          
+          console.log(`${mintFunction} successful! Transaction hash:`, tx.hash);
+          break; // Exit the loop if successful
+          
+        } catch (fallbackError) {
+          console.error(`${mintFunction} failed:`, fallbackError);
+          if (mintFunction === mintFunctions[mintFunctions.length - 1]) {
+            // If all mint functions fail, throw the error
+            throw new Error(`All mint functions failed. Contract might not be deployed properly. Last error: ${fallbackError instanceof Error ? fallbackError.message : 'Unknown error'}`);
+          }
+          // Continue to next mint function
+        }
+      }
+    }
+    
+    console.log('Transaction created successfully:', tx.hash);
     console.log(`Real blockchain transaction sent: ${tx.hash}`);
     
     // 4. Wait for the transaction to be mined with shorter timeout
