@@ -41,14 +41,16 @@ const mockDb = {
 };
 import { ethers } from 'ethers';
 
-// Standard ERC-721 ABI with common mint functions
+// KiroVerse Skill Badges contract ABI - matches our new contract
 const nftContractAbi = [
+  "function mintSkillBadge(address to, string memory tokenURI, string memory skillName) public returns (uint256)",
   "function mint(address to, string memory tokenURI) public returns (uint256)",
-  "function mintBadge(address to, string memory tokenURI) public returns (uint256)",
   "function safeMint(address to, string memory tokenURI) public returns (uint256)",
-  "function totalSupply() public view returns (uint256)",
   "function name() public view returns (string)",
-  "function symbol() public view returns (string)"
+  "function symbol() public view returns (string)",
+  "function totalSupply() public view returns (uint256)",
+  "function getTokenSkill(uint256 tokenId) public view returns (string)",
+  "function balanceOf(address owner) public view returns (uint256)"
 ];
 
 
