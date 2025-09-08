@@ -5,9 +5,40 @@ import { sendChatMessage as sendChatMessageFlow } from '@/ai/flows/send-chat-mes
 import { awardSkillBadge as awardSkillBadgeFlow } from '@/ai/flows/award-skill-badge';
 import { generateBadgeIcon as generateBadgeIconFlow } from '@/ai/flows/generate-badge-icon';
 import { adminDb } from '@/lib/firebase/admin';
-import { mockDb } from '@/lib/mock-db';
 import type { Badge } from '@/types';
 import { FieldValue } from 'firebase-admin/firestore';
+
+// In-memory mock database for demo purposes when Firebase admin is not available
+const mockUserData: Record<string, { badges: Badge[]; demoMode: boolean }> = {};
+
+const mockDb = {
+  getUserData: (userId: string) => {
+    if (!mockUserData[userId]) {
+      mockUserData[userId] = { badges: [], demoMode: true };
+    }
+    return mockUserData[userId];
+  },
+
+  getUserBadges: (userId: string): Badge[] => {
+    const userData = mockDb.getUserData(userId);
+    return userData.badges.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  },
+
+  addBadge: (userId: string, badge: Badge): void => {
+    const userData = mockDb.getUserData(userId);
+    userData.badges.push(badge);
+  },
+
+  getDemoMode: (userId: string): boolean => {
+    const userData = mockDb.getUserData(userId);
+    return userData.demoMode;
+  },
+
+  setDemoMode: (userId: string, demoMode: boolean): void => {
+    const userData = mockDb.getUserData(userId);
+    userData.demoMode = demoMode;
+  }
+};
 import { ethers } from 'ethers';
 
 // A simple ABI for our NFT contract's mint function
