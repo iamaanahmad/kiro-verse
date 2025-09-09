@@ -6,8 +6,46 @@ import { AuthProvider } from '@/lib/firebase/auth';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Kiro-Interactive Code Mentor & Web3 Skill Hub',
-  description: 'An interactive code mentor and Web3 skill hub powered by AI.',
+  title: 'KiroVerse - AI-Powered Code Dojo with Blockchain Credentials',
+  description: 'Where AI mentorship meets verifiable blockchain achievements. Learn coding with personalized AI guidance and earn unfakeable NFT skill badges.',
+  keywords: 'AI mentorship, blockchain credentials, coding education, NFT badges, skill verification, Kiro',
+  authors: [{ name: 'Amaan Ahmad', url: 'https://github.com/iamaanahmad' }],
+  creator: 'Amaan Ahmad',
+  publisher: 'KiroVerse',
+  icons: {
+    icon: [
+      { url: '/favicon-16.svg', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon.svg', sizes: '32x32', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.svg',
+  },
+  manifest: '/manifest.json',
+  openGraph: {
+    title: 'KiroVerse - AI-Powered Code Dojo with Blockchain Credentials',
+    description: 'Where AI mentorship meets verifiable blockchain achievements',
+    url: 'https://kiroverse.vercel.app',
+    siteName: 'KiroVerse',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'KiroVerse - AI-Powered Code Dojo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KiroVerse - AI-Powered Code Dojo with Blockchain Credentials',
+    description: 'Where AI mentorship meets verifiable blockchain achievements',
+    images: ['/og-image.png'],
+    creator: '@KiroVerse',
+  },
 };
 
 export default function RootLayout({

@@ -1,9 +1,13 @@
 # 🎬 KiroVerse Demo Video Script
 **Duration: 3 minutes | Target: "Code with Kiro" Hackathon Judges**
 
+## 🎯 **Two Approaches Available:**
+1. **📢 [Original] Voiceover Version** - Professional narration (see below)
+2. **📱 [Recommended] Silent Version** - Text overlays + music (see `SILENT_DEMO_GUIDE.md`)
+
 ---
 
-## 📝 **Script Outline**
+## 📝 **Original Script Outline** (with voiceover)
 
 ### **HOOK (0:00-0:15) - 15 seconds**
 **[Screen: KiroVerse landing page]**
