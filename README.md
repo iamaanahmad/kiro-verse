@@ -97,7 +97,7 @@ When you demonstrate a programming skill, KiroVerse automatically:
 - ⚡ **Demo Mode**: Instant badge creation with mock transactions (perfect for demonstrations)
 - 🔗 **Production Mode**: Real NFT minting on Sepolia testnet (verifiable blockchain credentials)
 
-**Example Badge Transaction**: [View on Etherscan](https://sepolia.etherscan.io/tx/0x123...)
+**Example Badge Transaction**: [View on Etherscan](https://sepolia.etherscan.io/tx/0xc2a95072d7d68b0d085991d75e79eee7b2e5db051bd169cbf2f117ab5b22a1a9)
 
 ### 🔍 "Behind the Scenes" Transparency
 See exactly how Kiro built KiroVerse:
