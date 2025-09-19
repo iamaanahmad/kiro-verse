@@ -5,10 +5,10 @@
 ## 🎬 **Live Demo & Video**
 
 ### 📹 **3-Minute Demo Video** 
-**[🎥 Watch KiroVerse in Action](https://youtube.com/watch?v=your-demo-video)** *(Required for judges)*
+**[🎥 Watch KiroVerse in Action](https://www.youtube.com/watch?v=qygk69wlpuA)** *(Required for judges)*
 
 ### 🌐 **Try It NOW - Live Demo**
-**🚀 [Launch KiroVerse](https://kiroverse.vercel.app)** - *No signup required!*
+**🚀 [Launch KiroVerse](https://kiro-verse.appwrite.network/)** - *No signup required!*
 
 **For Judges**: Toggle between Demo Mode (instant) and Production Mode (real blockchain) to see both capabilities!
 
