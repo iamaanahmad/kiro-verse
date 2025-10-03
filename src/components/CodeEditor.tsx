@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { CodeXml, Loader2, Sparkles, CheckCircle2, AlertTriangle, Info, Lightbulb, Code2 } from "lucide-react";
+import { CodeXml, Loader2, Sparkles, CheckCircle2, AlertTriangle, Info, Lightbulb, Code2, Maximize2, Minimize2 } from "lucide-react";
 import KiroSpecDisplay from "./KiroSpecDisplay";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface CodeEditorProps {
   code: string;
@@ -16,6 +16,8 @@ interface CodeEditorProps {
   onGetFeedback: () => void;
   aiFeedback: string;
   isLoading: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 // Enhanced AI Feedback Renderer with better formatting
@@ -172,25 +174,88 @@ const codeFeedbackSpec = {
   `,
 };
 
-export default function CodeEditor({ code, onCodeChange, onGetFeedback, aiFeedback, isLoading }: CodeEditorProps) {
+export default function CodeEditor({ code, onCodeChange, onGetFeedback, aiFeedback, isLoading, isExpanded = false, onToggleExpand }: CodeEditorProps) {
+  // Keyboard shortcut for expand/collapse (F11 or Ctrl+Shift+E)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (onToggleExpand && (
+        event.key === 'F11' || 
+        (event.ctrlKey && event.shiftKey && event.key === 'E')
+      )) {
+        event.preventDefault();
+        onToggleExpand();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onToggleExpand]);
+
   return (
-    <Card className="h-full flex flex-col shadow-md">
+    <Card className={`flex flex-col shadow-md transition-all duration-300 ${isExpanded ? 'h-screen' : 'h-full'}`}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-headline">
-          <CodeXml className="h-6 w-6" />
-          Code Editor
-        </CardTitle>
-        <CardDescription>Write or paste your code here to get AI-powered feedback.</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 font-headline">
+              <CodeXml className="h-6 w-6" />
+              Code Editor
+              {isExpanded && (
+                <Badge variant="secondary" className="ml-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                  Expanded
+                </Badge>
+              )}
+            </CardTitle>
+            <CardDescription>Write or paste your code here to get AI-powered feedback.</CardDescription>
+          </div>
+          {onToggleExpand && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleExpand}
+              className="flex items-center gap-2 hover:bg-primary/10 transition-colors"
+              title={isExpanded ? "Collapse editor (F11 or Ctrl+Shift+E)" : "Expand editor (F11 or Ctrl+Shift+E)"}
+            >
+              {isExpanded ? (
+                <>
+                  <Minimize2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Collapse</span>
+                  <span className="hidden lg:inline text-xs text-muted-foreground ml-1">(F11)</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Expand</span>
+                  <span className="hidden lg:inline text-xs text-muted-foreground ml-1">(F11)</span>
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col gap-4">
-        <div className="relative flex-grow">
+        <div className={`relative flex-grow ${isExpanded ? 'min-h-[60vh]' : ''}`}>
           <Textarea
             value={code}
             onChange={(e) => onCodeChange(e.target.value)}
             placeholder="Enter your code here..."
-            className="h-full w-full font-code text-sm resize-none rounded-md"
+            className={`h-full w-full font-code resize-none rounded-md transition-all duration-200 ${
+              isExpanded 
+                ? 'text-base leading-relaxed p-4' 
+                : 'text-sm p-3'
+            }`}
             aria-label="Code Input"
+            style={{
+              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace',
+              lineHeight: isExpanded ? '1.6' : '1.4'
+            }}
           />
+          {isExpanded && (
+            <div className="absolute top-2 right-2 bg-black/10 dark:bg-white/10 backdrop-blur-sm rounded-md px-2 py-1">
+              <span className="text-xs text-muted-foreground">
+                Lines: {code.split('\n').length} | Chars: {code.length}
+              </span>
+            </div>
+          )}
         </div>
         {aiFeedback && (
            <div className="mt-6">

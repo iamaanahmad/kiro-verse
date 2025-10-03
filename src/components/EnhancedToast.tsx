@@ -84,3 +84,4 @@ const EnhancedToast: React.FC<EnhancedToastProps> = ({
 };
 
 export default EnhancedToast;
+export { EnhancedToast };

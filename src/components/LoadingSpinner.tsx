@@ -49,7 +49,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   };
 
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-2", className)}>
+    <div className={cn("flex flex-col items-center justify-center gap-2", className)} data-testid="loading-spinner">
       {renderSpinner()}
       {message && (
         <p className="text-sm text-muted-foreground animate-pulse">{message}</p>
@@ -59,3 +59,4 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 };
 
 export default LoadingSpinner;
+export { LoadingSpinner };

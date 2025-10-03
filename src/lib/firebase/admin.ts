@@ -37,7 +37,14 @@ if (getApps().length > 0) {
       doc: () => ({
         get: () => Promise.resolve({ exists: false, data: () => null }),
         set: () => Promise.resolve(),
+        delete: () => Promise.resolve(),
       }),
+    }),
+    batch: () => ({
+      set: () => {},
+      update: () => {},
+      delete: () => {},
+      commit: () => Promise.resolve(),
     }),
   };
   adminAuth = {};

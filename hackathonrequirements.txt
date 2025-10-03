@@ -1,0 +1,306 @@
+Code with Kiro Hackathon - Complete Rules & Requirements
+📅 Important Dates & Timeline
+Event	Date & Time
+Submission Period	Monday, July 14, 2025 (9:00 AM PST) - Monday, September 15, 2025 (12:00 PM PST)
+Judging Period	Monday, September 29, 2025 (1:00 PM PST) - Monday, October 20, 2025 (1:00 PM PST)
+Winners Announced	Friday, October 24, 2025 (9:00 AM PST)
+🏢 Organizers
+Sponsor: Amazon Web Services (410 Terry Avenue North, Seattle, WA 98109)
+
+Administrator: Devpost, Inc. (222 Broadway, Floor 19, New York, NY 10038)
+
+✅ Eligibility Requirements
+WHO CAN PARTICIPATE:
+Individuals: Age of majority in their jurisdiction
+
+Teams: Maximum 3 participants per team
+
+Organizations: Legal entities (corporations, nonprofits, LLCs, partnerships)
+
+REGISTRATION LIMIT:
+Capped at approximately 10,000 registrants
+
+Access codes to Kiro provided after registration
+
+WHO CANNOT PARTICIPATE:
+Residents of prohibited countries (Brazil, Quebec, Russia, Crimea, Cuba, Iran, North Korea, Syria)
+
+Employees/agents of promotion entities (AWS, Devpost)
+
+Judges or their employers
+
+Anyone creating conflict of interest
+
+🚀 How to Enter
+STEP 1: Register
+Visit kiro.devpost.com
+
+Click "Join Hackathon"
+
+Create/login to Devpost account
+
+Receive Kiro access within 3 business days
+
+STEP 2: Build Your Project
+Choose one category:
+
+Productivity & Workflow Tools: Time-saving, friction-reducing tools
+
+Games & Entertainment: Interactive, expressive, fun experiences
+
+Educational Apps: Learning platforms, tutorials, AI-enhanced education
+
+Wildcard/Freestyle: Anything that doesn't fit above categories
+
+STEP 3: Submit Your Entry
+Complete all required fields on Devpost submission page
+
+📋 Project Requirements
+FUNCTIONALITY:
+Must be a working software application using Kiro
+
+Must install and run consistently on intended platform
+
+Must function as shown in demo video/description
+
+NEW VS. EXISTING:
+New Projects: Created during submission period
+
+Existing Projects: Must be significantly updated with new use case during submission period
+
+THIRD-PARTY INTEGRATIONS:
+Must be authorized to use any third-party SDKs/APIs/data
+
+Must comply with all licensing requirements
+
+🎬 Submission Requirements
+REQUIRED COMPONENTS:
+Working Project built with Kiro meeting above requirements
+
+Text Description explaining features and functionality
+
+Demo Video (UNDER 3 MINUTES):
+
+Must show how Kiro was used to create the project
+
+Examples for different approaches:
+
+Building from scratch: How you structured conversations with Kiro
+
+Agent hooks: What workflows you automated with Kiro hooks
+
+Spec-to-code: How you structured specs for Kiro implementation
+
+Must show project functioning on intended device
+
+Must be public on YouTube, Vimeo, Facebook Video, or Youku
+
+Cannot include unauthorized trademarks or copyrighted material
+
+Open Source Code Repository:
+
+Must be public with OSI-approved open source license
+
+Must be accessible for judging and testing
+
+Category Selection: Choose one of the four categories
+
+Kiro Usage Write-up: Explain how Kiro was used in your project
+
+TESTING ACCESS:
+Must provide working demo, website link, or test build
+
+If private, include login credentials
+
+Must be free and unrestricted for judges
+
+Available until judging period ends
+
+LANGUAGE:
+All materials must be in English (or provide English translation)
+
+⚖️ Judging Process & Criteria
+JUDGING STAGES:
+Stage 1: Pass/Fail - Baseline viability check
+
+Does project fit theme?
+
+Does it properly use required Kiro APIs/SDKs?
+
+Stage 2: Scored evaluation on three equally weighted criteria:
+
+Potential Value
+
+Wide usefulness
+
+Ease of use
+
+Accessibility
+
+Implementation
+
+How well the idea leverages Kiro
+
+Quality of the Idea
+
+Creativity and originality
+
+Unique problem-solving approach
+
+Use of unique datasets
+
+JUDGES:
+Selected by sponsor (may include AWS employees or third parties)
+
+May judge in multiple rounds
+
+Can change during judging period
+
+Have discretion to award up to 4 additional Influencer Choice prizes
+
+TIE-BREAKING:
+Highest score in first criterion wins
+
+If still tied, compare next criterion
+
+If tied on all criteria, judges vote
+
+🏆 Prize Structure
+OVERALL PRIZES:
+Place	Prize Amount	Quantity
+1st Place	$30,000 USD	1
+2nd Place	$15,000 USD	1
+3rd Place	$10,000 USD	1
+CATEGORY PRIZES ($5,000 each):
+Best Productivity & Workflow Tools
+
+Best Games & Entertainment
+
+Best Educational Apps
+
+Best Wildcard/Freestyle
+
+BONUS PRIZES:
+Most Innovative Use of Kiro: $2,000 (5 winners)
+
+Influencer Judges Choice: $1,000 (4 winners)
+
+POST PRIZES:
+Social Blitz Prize: $200 (5 winners)
+
+Bonus Blog Prize: $100 (first 100 eligible blog posts)
+
+PRIZE ELIGIBILITY RULES:
+Project can win up to ONE Overall Prize OR ONE Category Prize + ONE Bonus Prize
+
+Individual can win up to TWO Post Prizes
+
+SPECIAL PRIZE ENTRY REQUIREMENTS:
+Social Blitz Prize:
+
+Post on X, LinkedIn, Instagram, or BlueSky
+
+Describe favorite thing about Kiro and how it changed your development approach
+
+Tag @kirodotdev and use #hookedonkiro
+
+Must post during submission period
+
+Bonus Blog Prize:
+
+Submit blog post on dev.to/kirodotdev
+
+Use hashtag #kiro
+
+💰 Prize Delivery & Tax Information
+DELIVERY:
+Prizes paid to Entrant (individual), Representative (team), or Organization
+
+Team representatives responsible for internal prize allocation
+
+Monetary prizes mailed to address or sent electronically
+
+Must complete winner affidavit within 10 business days
+
+Prizes delivered within 60 days of completed forms
+
+TAXES & FEES:
+Winners responsible for all applicable taxes in their jurisdiction
+
+Winners responsible for wiring fees, currency exchange fees
+
+May need to provide tax forms (W-9 for US residents, W-8BEN for international)
+
+Must comply with foreign exchange and banking regulations
+
+Sponsor may withhold portion for tax compliance
+
+📝 Intellectual Property & Rights
+OWNERSHIP:
+Submissions remain intellectual property of creators
+
+Sponsor gets non-exclusive license for judging
+
+Sponsor and Devpost can promote submissions and use contributor names/images for 3 years
+
+REQUIREMENTS:
+Must be original work of entrant
+
+Must be solely owned by entrant
+
+Cannot violate IP rights of others
+
+Can use open source software if compliant with licenses
+
+Can contract technical assistance if final work is entrant's ideas and creativity
+
+⚖️ Legal Terms & Conditions
+ENTRY CONDITIONS:
+By entering, participants agree to:
+
+Be bound by official rules and judge decisions
+
+Release organizers from liability
+
+Allow use of personal information for promotional purposes
+
+MODIFICATIONS:
+Sponsors reserve right to cancel, suspend, or modify hackathon
+
+Official rules subject to change (posted on website)
+
+Can request clarification of ambiguous terms before deadline
+
+DISPUTES:
+Resolved by binding arbitration under American Arbitration Association
+
+Governed by New York state law
+
+No class action lawsuits permitted
+
+Limited to actual out-of-pocket expenses
+
+PRIVACY:
+Information subject to Devpost's Privacy Policy
+
+Available at info.devpost.com/privacy
+
+📞 Contact Information
+For questions, email: support@devpost.com
+
+🎯 Key Success Tips
+Register Early: Limited to ~10,000 participants
+
+Use Kiro Extensively: Judged heavily on Kiro implementation
+
+Document Your Process: Show how Kiro helped in your video
+
+Choose Right Category: Align your project with appropriate category
+
+Make It Open Source: Required for submission
+
+Test Everything: Ensure judges can access and test your project
+
+Follow Video Guidelines: Under 3 minutes, show Kiro usage clearly
+
+Enter Bonus Prizes: Easy additional prize opportunities via social posts and blogs

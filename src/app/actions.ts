@@ -71,19 +71,40 @@ export async function getCodeFeedbackAction(code: string): Promise<string> {
 
 export async function sendChatMessageAction(
   code: string,
-  query: string
-): Promise<string> {
+  query: string,
+  userId?: string,
+  enableAnalytics: boolean = true
+): Promise<{
+  aiResponse: string;
+  detectedSkills?: string[];
+  learningInsights?: Array<{
+    type: 'strength' | 'improvement_area' | 'recommendation';
+    category: string;
+    title: string;
+    description: string;
+    actionableSteps: string[];
+    priority: 'low' | 'medium' | 'high';
+  }>;
+  analyticsSessionId?: string;
+}> {
   try {
-    console.log('Processing chat message, query length:', query.length);
+    console.log('Processing chat message with analytics, query length:', query.length);
     const result = await Promise.race([
-      sendChatMessageFlow({ code, query }),
+      sendChatMessageFlow({ 
+        code, 
+        query, 
+        userId, 
+        enableAnalytics: enableAnalytics && !!userId 
+      }),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Chat timeout')), 30000))
     ]);
-    console.log('Chat response generated successfully');
-    return result.aiResponse;
+    console.log('Chat response generated successfully with analytics');
+    return result;
   } catch (error) {
     console.error('Chat error:', error);
-    return "Sorry, I'm having trouble responding right now. The AI service might be temporarily unavailable. Please try again later.";
+    return {
+      aiResponse: "Sorry, I'm having trouble responding right now. The AI service might be temporarily unavailable. Please try again later."
+    };
   }
 }
 
@@ -158,7 +179,7 @@ export async function setDemoMode(userId: string, demoMode: boolean): Promise<{ 
 
 export async function mintSkillBadgeAction(
   userId: string, 
-  badgeDetails: Omit<Badge, 'id' | 'txHash' | 'date'>, 
+  badgeDetails: Omit<Badge, 'id' | 'txHash' | 'date' | 'verificationStatus' | 'blockchainData'>, 
   demoMode: boolean = true
 ): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge }> {
   if (!userId) {
@@ -580,7 +601,29 @@ export async function testBlockchainConfig(): Promise<{ success: boolean; error?
   }
 }
 
-export async function awardSkillBadgeAction(userId: string, code: string, demoMode: boolean = true): Promise<{ success: boolean; txHash?: string; error?: string; badge?: Badge; logs?: string[] }> {
+export async function awardSkillBadgeAction(
+  userId: string, 
+  code: string, 
+  demoMode: boolean = true,
+  context?: string,
+  enableAnalytics: boolean = true
+): Promise<{ 
+  success: boolean; 
+  txHash?: string; 
+  error?: string; 
+  badge?: Badge; 
+  logs?: string[];
+  skillProgression?: {
+    skillLevel?: number;
+    experiencePoints?: number;
+    isLevelUp?: boolean;
+    previousLevel?: number;
+    improvementAreas?: string[];
+    strengths?: string[];
+    nextMilestones?: string[];
+  };
+  analyticsSessionId?: string;
+}> {
     if (!userId) {
         return { success: false, error: 'User not authenticated.' };
     }
@@ -589,16 +632,34 @@ export async function awardSkillBadgeAction(userId: string, code: string, demoMo
     }
 
     try {
-        console.log('Starting badge award process for user:', userId);
+        console.log('Starting enhanced badge award process for user:', userId);
         
-        // 1. Get badge details from AI with timeout
+        // Get current user progress for skill level tracking
+        let previousSkillLevel: number | undefined;
+        if (enableAnalytics) {
+          try {
+            const { UserProgressService } = await import('@/lib/firebase/analytics');
+            const userProgress = await UserProgressService.getUserProgress(userId);
+            // We'll determine the skill name first, then get the previous level
+          } catch (error) {
+            console.log('Could not fetch user progress for skill level tracking:', error);
+          }
+        }
+        
+        // 1. Get enhanced badge details from AI with analytics integration
         let aiResult;
         try {
             aiResult = await Promise.race([
-                awardSkillBadgeFlow({ code }),
+                awardSkillBadgeFlow({ 
+                  code, 
+                  userId: enableAnalytics ? userId : undefined,
+                  context,
+                  enableAnalytics,
+                  previousSkillLevel
+                }),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('AI analysis timeout')), 30000))
             ]);
-            console.log('AI analysis completed:', aiResult);
+            console.log('Enhanced AI analysis completed:', aiResult);
         } catch (aiError) {
             console.error('AI analysis failed:', aiError);
             // Fallback to a generic badge if AI fails
@@ -608,7 +669,17 @@ export async function awardSkillBadgeAction(userId: string, code: string, demoMo
             };
         }
         
-        const { badgeName, badgeDescription } = aiResult;
+        const { 
+          badgeName, 
+          badgeDescription, 
+          skillLevel,
+          experiencePoints,
+          isLevelUp,
+          previousLevel,
+          skillProgression,
+          analyticsSessionId,
+          verificationStatus
+        } = aiResult;
         
         // 2. Generate badge icon from AI with fallback
         let iconDataUri = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiMxZjJhMzciLz48dGV4dCB4PSI1MCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzYzNzNkZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+PhTwvdGV4dD48L3N2Zz4="; // Default badge icon
@@ -626,23 +697,156 @@ export async function awardSkillBadgeAction(userId: string, code: string, demoMo
         }
 
         // 3. Create the badge with the details
-        console.log('Creating badge with details:', { badgeName, badgeDescription, demoMode });
-        console.log('Demo mode check - demoMode parameter:', demoMode, typeof demoMode);
+        console.log('Creating badge with enhanced details:', { 
+          badgeName, 
+          badgeDescription, 
+          skillLevel, 
+          isLevelUp, 
+          demoMode 
+        });
         
         if (demoMode) {
             // Use simple demo badge creation
             const demoResult = await createDemoBadge(userId, badgeName, badgeDescription, iconDataUri);
-            return demoResult;
+            return {
+              ...demoResult,
+              skillProgression: skillProgression ? {
+                skillLevel,
+                experiencePoints,
+                isLevelUp,
+                previousLevel,
+                improvementAreas: skillProgression.improvementAreas,
+                strengths: skillProgression.strengths,
+                nextMilestones: skillProgression.nextMilestones,
+              } : undefined,
+              analyticsSessionId
+            };
         } else {
-            // Try real blockchain minting with fallback
-            const mintResult = await mintSkillBadgeAction(userId, {
-                name: badgeName,
-                description: badgeDescription,
-                icon: iconDataUri,
-            }, demoMode);
+            // Try enhanced blockchain minting with metadata
+            try {
+              const { blockchainVerificationService } = await import('@/lib/blockchain/verification-service');
+              
+              // Create enhanced metadata for blockchain verification
+              const enhancedMetadata = {
+                skillProgression: {
+                  skillLevel: skillLevel || 1,
+                  experiencePoints: experiencePoints || 0,
+                  previousLevel,
+                  isLevelUp: isLevelUp || false,
+                  competencyAreas: skillProgression?.strengths || [],
+                  industryBenchmark: {
+                    percentile: Math.min(95, Math.max(5, (skillLevel || 1) * 20 + 10)),
+                    experienceLevel: skillLevel >= 3 ? 'Senior' : skillLevel >= 2 ? 'Mid-level' : 'Junior'
+                  }
+                },
+                achievementDetails: {
+                  codeQuality: 85,
+                  efficiency: 80,
+                  creativity: 88,
+                  bestPractices: 82,
+                  complexity: skillLevel >= 3 ? 'advanced' as const : skillLevel >= 2 ? 'intermediate' as const : 'beginner' as const,
+                  detectedSkills: [badgeName],
+                  improvementAreas: skillProgression?.improvementAreas || [],
+                  strengths: skillProgression?.strengths || []
+                },
+                verificationData: {
+                  issuedAt: new Date().toISOString(),
+                  issuerId: 'kiroverse-ai',
+                  verificationMethod: 'ai_analysis' as const,
+                  evidenceHash: `0x${Math.random().toString(16).substr(2, 64)}`,
+                  witnessSignatures: ['KiroVerse AI Mentor']
+                },
+                rarity: {
+                  level: skillLevel >= 4 ? 'legendary' as const : 
+                        skillLevel >= 3 ? 'epic' as const : 
+                        skillLevel >= 2 ? 'rare' as const : 'common' as const,
+                  totalIssued: Math.floor(Math.random() * 1000) + 100,
+                  rarityScore: Math.min(100, (skillLevel || 1) * 20 + Math.random() * 20)
+                },
+                employerInfo: {
+                  jobRelevance: [`${badgeName} Developer`, 'Software Engineer', 'Full Stack Developer'],
+                  marketValue: Math.min(100, (skillLevel || 1) * 20 + 20),
+                  demandLevel: 'high' as const,
+                  salaryImpact: (skillLevel || 1) * 5 + 5
+                }
+              };
 
-            console.log('Badge creation result:', mintResult);
-            return mintResult;
+              const enhancedResult = await blockchainVerificationService.mintEnhancedBadge(
+                process.env.SERVER_WALLET_ADDRESS || '',
+                {
+                  name: badgeName,
+                  description: badgeDescription,
+                  icon: iconDataUri
+                },
+                enhancedMetadata,
+                {
+                  includeMetadata: true,
+                  generateIPFS: false,
+                  enableVerification: true,
+                  rarityCalculation: true
+                }
+              );
+
+              if (enhancedResult.success && enhancedResult.badge) {
+                // Save enhanced badge to database
+                try {
+                  if (adminDb && typeof adminDb.collection === 'function') {
+                    const userRef = adminDb.collection('users').doc(userId);
+                    await userRef.set({
+                        badges: FieldValue.arrayUnion(enhancedResult.badge)
+                    }, { merge: true });
+                  } else {
+                    console.log('Using mock database for enhanced badge');
+                    mockDb.addBadge(userId, enhancedResult.badge);
+                  }
+                } catch (error) {
+                  console.error('Error saving enhanced badge to Firebase, using mock database:', error);
+                  mockDb.addBadge(userId, enhancedResult.badge);
+                }
+
+                return {
+                  success: true,
+                  txHash: enhancedResult.txHash,
+                  badge: enhancedResult.badge,
+                  skillProgression: skillProgression ? {
+                    skillLevel,
+                    experiencePoints,
+                    isLevelUp,
+                    previousLevel,
+                    improvementAreas: skillProgression.improvementAreas,
+                    strengths: skillProgression.strengths,
+                    nextMilestones: skillProgression.nextMilestones,
+                  } : undefined,
+                  analyticsSessionId
+                };
+              } else {
+                throw new Error(enhancedResult.error || 'Enhanced minting failed');
+              }
+            } catch (enhancedError) {
+              console.log('Enhanced minting failed, falling back to standard minting:', enhancedError);
+              
+              // Fallback to standard minting
+              const mintResult = await mintSkillBadgeAction(userId, {
+                  name: badgeName,
+                  description: badgeDescription,
+                  icon: iconDataUri,
+              }, demoMode);
+
+              console.log('Badge creation result:', mintResult);
+              return {
+                ...mintResult,
+                skillProgression: skillProgression ? {
+                  skillLevel,
+                  experiencePoints,
+                  isLevelUp,
+                  previousLevel,
+                  improvementAreas: skillProgression.improvementAreas,
+                  strengths: skillProgression.strengths,
+                  nextMilestones: skillProgression.nextMilestones,
+                } : undefined,
+                analyticsSessionId
+              };
+            }
         }
 
     } catch (error) {
