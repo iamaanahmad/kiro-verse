@@ -20,8 +20,11 @@ interface ChatInterfaceProps {
 
 // Enhanced message content renderer
 const MessageContent = ({ content, role }: { content: string; role: 'user' | 'assistant' }) => {
+  // Safety check: ensure content is a string
+  const safeContent = typeof content === 'string' ? content : String(content || '');
+  
   if (role === 'user') {
-    return <p className="text-sm leading-relaxed">{content}</p>;
+    return <p className="text-sm leading-relaxed">{safeContent}</p>;
   }
   
   // Enhanced AI message rendering
@@ -43,7 +46,7 @@ const MessageContent = ({ content, role }: { content: string; role: 'user' | 'as
   };
   
   // Split into paragraphs and handle special formatting
-  const paragraphs = content.split('\n\n').filter(p => p.trim());
+  const paragraphs = safeContent.split('\n\n').filter(p => p.trim());
   
   return (
     <div className="space-y-2">

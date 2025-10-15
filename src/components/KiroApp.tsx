@@ -58,8 +58,14 @@ const KiroApp: React.FC<KiroAppProps> = ({ user }) => {
     const newMessages: ChatMessage[] = [...chatMessages, { role: 'user', content: query }];
     setChatMessages(newMessages);
 
-    const aiResponse = await sendChatMessageAction(codeContent, query);
-    setChatMessages([...newMessages, { role: 'assistant', content: aiResponse }]);
+    try {
+      const result = await sendChatMessageAction(codeContent, query);
+      const aiResponse = result?.aiResponse || "Sorry, I couldn't generate a response right now. Please try again.";
+      setChatMessages([...newMessages, { role: 'assistant', content: aiResponse }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setChatMessages([...newMessages, { role: 'assistant', content: "Sorry, I'm having trouble responding right now. The AI service might be temporarily unavailable. Please try again later." }]);
+    }
     setIsLoading(prev => ({ ...prev, chat: false }));
   };
 
